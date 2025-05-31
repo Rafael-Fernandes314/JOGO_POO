@@ -5,7 +5,7 @@ from player import Eindein
 
 pygame.init()
 
-largura = 840
+largura = 920
 altura = 480
 
 PRETO = (0, 0, 0)
@@ -13,8 +13,8 @@ PRETO = (0, 0, 0)
 tela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption("Jogo")
 
-fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase-1.png").convert()
-fundo_img = pygame.transform.scale(fundo_img, (200 * 6.5, 75 * 6.5))
+fundo_img = pygame.image.load("Assets/Sprites/Cenários/fundo teste.png").convert()
+fundo_img = pygame.transform.scale(fundo_img, (1000, 500))
 fundo_largura = 1300
 
 sprites = pygame.sprite.Group()
@@ -24,7 +24,7 @@ sprites.add(eindein)
 relógio = pygame.time.Clock()
 
 while True:
-    relógio.tick(30)
+    relógio.tick(60)
     tela.fill(PRETO)
 
     for event in pygame.event.get():
