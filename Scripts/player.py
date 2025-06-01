@@ -14,9 +14,7 @@ class Eindein(pygame.sprite.Sprite):
         self.gravidade = 2
         self.velocidade = 5
 
-    def sprite_e (self):
         self.sprite_e:List[Eindein] = []
-
         self.sprite_e.append(pygame.transform.scale(pygame.image.load("Assets/Sprites/Player/Eidein-parado-e.png"), (32 * 4, 32 * 4)))
         self.sprite_e.append(pygame.transform.scale(pygame.image.load("Assets/Sprites/Player/Eidein-andando-e1.png"), (32 * 4, 32 * 4)))
         self.sprite_e.append(pygame.transform.scale(pygame.image.load("Assets/Sprites/Player/Eidein-andando-e2.png"), (32 * 4, 32 * 4)))
@@ -28,9 +26,7 @@ class Eindein(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = (100, 100)
 
-    def sprite_d (self):
         self.sprite_d:List[Eindein] = []
-
         self.sprite_d.append(pygame.transform.scale(pygame.image.load("Assets/Sprites/Player/Eidein-parado-d.png"), (32 * 4, 32 * 4)))
         self.sprite_d.append(pygame.transform.scale(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d1.png"), (32 * 4, 32 * 4)))
         self.sprite_d.append(pygame.transform.scale(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d2.png"), (32 * 4, 32 * 4)))
