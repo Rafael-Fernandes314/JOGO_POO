@@ -33,12 +33,16 @@ while True:
         if event.type == KEYDOWN:
             if event.key == K_SPACE:
                 eindein.pular()
+            if event.key == K_a:
+                eindein.mover("esquerda")
+            if event.key == K_d:
+                eindein.mover("direita")
 
     teclas = pygame.key.get_pressed()
 
     if teclas[K_a]:
         eindein.mover("esquerda")
-
+        
     elif teclas[K_d]:
         eindein.mover("direita")
 
