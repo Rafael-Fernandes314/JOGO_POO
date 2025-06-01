@@ -50,6 +50,7 @@ class Eindein(pygame.sprite.Sprite):
         if self.rect.bottom >= 515:
             self.rect.bottom = 515
             self.pulando = False
+
         if self.animar == True:
             self.atual1 = self.atual1 + 0.2
             if self.atual1 >= len(self.sprite_e):
@@ -73,7 +74,6 @@ class Eindein(pygame.sprite.Sprite):
         elif direcao == "direita":
             self.rect.x += self.velocidade
             
-
     def pular(self):
         if not self.pulando:
             self.vel_y = -25
