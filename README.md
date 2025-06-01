@@ -17,7 +17,7 @@ Neste jogo, você controla personagens em um mundo repleto de fases, inimigos e 
 
 2. Instale as dependências:
 
-   * requirements.txt
+   * https://github.com/Rafael-Fernandes314/JOGO_POO/blob/main/requirements.txt
 
 3. Execute o jogo:
 
