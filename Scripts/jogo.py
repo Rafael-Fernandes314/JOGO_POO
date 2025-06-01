@@ -15,7 +15,6 @@ pygame.display.set_caption("Jogo")
 
 fundo_img = pygame.image.load("Assets/Sprites/Cenários/fundo teste.png").convert()
 fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
-fundo_largura = 1300
 
 sprites = pygame.sprite.Group()
 eindein = Eindein()
