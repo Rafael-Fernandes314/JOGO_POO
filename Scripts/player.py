@@ -24,8 +24,8 @@ class Eindein(pygame.sprite.Sprite):
         self.vel_y += self.gravidade
         self.rect.y += self.vel_y
 
-        if self.rect.bottom >= 395:
-            self.rect.bottom = 395
+        if self.rect.bottom >= 515:
+            self.rect.bottom = 515
             self.pulando = False
 
     def mover(self, direcao):

@@ -5,8 +5,8 @@ from player import Eindein
 
 pygame.init()
 
-largura = 920
-altura = 480
+largura = 1020
+altura = 680
 
 PRETO = (0, 0, 0)
 
@@ -14,7 +14,7 @@ tela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption("Jogo")
 
 fundo_img = pygame.image.load("Assets/Sprites/Cenários/fundo teste.png").convert()
-fundo_img = pygame.transform.scale(fundo_img, (1000, 500))
+fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 fundo_largura = 1300
 
 sprites = pygame.sprite.Group()
