@@ -22,6 +22,8 @@ sprites.add(eindein)
 
 relógio = pygame.time.Clock()
 
+scroll_x = 0
+
 while True:
     relógio.tick(60)
     tela.fill(PRETO)
@@ -33,20 +35,27 @@ while True:
         if event.type == KEYDOWN:
             if event.key == K_SPACE:
                 eindein.pular()
-            if event.key == K_a:
-                eindein.mover("esquerda")
-            if event.key == K_d:
-                eindein.mover("direita")
 
     teclas = pygame.key.get_pressed()
 
     if teclas[K_a]:
         eindein.mover("esquerda")
-        
-    elif teclas[K_d]:
-        eindein.mover("direita")
+        if eindein.rect.left <= 200:
+            scroll_x -= 5
+            eindein.rect.left = 200 
 
-    tela.blit(fundo_img, (0,0))
-    sprites.draw(tela)
+    elif teclas[K_d]:
+        if eindein.rect.right >= largura - 200:
+            scroll_x += 5
+            eindein.rect.right = largura - 200
+        else:
+            eindein.mover("direita")
+
+    for i in range(-1, largura // fundo_img.get_width() + 3):
+        x = i * fundo_img.get_width() - (scroll_x % fundo_img.get_width())
+        tela.blit(fundo_img, (x, 0))
+
+    tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
+
     sprites.update()
     pygame.display.flip()
