@@ -45,12 +45,11 @@ while True:
             eindein.rect.left = 200 
 
     elif teclas[K_d]:
-        if eindein.rect.right >= largura - 200:
+        eindein.mover("direita")
+        if eindein.rect.left >= 200:
             scroll_x += 5
-            eindein.rect.right = largura - 200
-        else:
-            eindein.mover("direita")
-
+            eindein.rect.left = 200 
+            
     for i in range(-1, largura // fundo_img.get_width() + 3):
         x = i * fundo_img.get_width() - (scroll_x % fundo_img.get_width())
         tela.blit(fundo_img, (x, 0))
