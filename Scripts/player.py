@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from typing import List
 
+
 pygame.init()
 
 class Eindein(pygame.sprite.Sprite):
@@ -17,11 +18,11 @@ class Eindein(pygame.sprite.Sprite):
         self.gravidade = 2
         self.velocidade = 3
         self.animar = False
+        
 
         self.sprite_e:List[Eindein] = []
         self.sprite_d:List[Eindein] = []
         self.sprite_pe:List[Eindein] = []
-        self.sprite_pd:List[Eindein] = []
 
         self.sprite_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-parado-e.png"))
         self.sprite_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-e1.png"))
@@ -35,17 +36,16 @@ class Eindein(pygame.sprite.Sprite):
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d3.png"))
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d4.png"))
 
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e1"))
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e2"))
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e3"))
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e4"))
+        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e1.png"))
+        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e2.png"))
+        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e3.png"))
+        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e4.png"))
 
         self.atual1 = 0
         self.atual2 = 0
         self.atual3 = 0
         self.image = self.sprite_e[self.atual1]
         self.image = self.sprite_d[self.atual2]
-        self.image = self.sprite_pe[self.atual3]
         self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
         self.rect = self.image.get_rect()
         self.rect.topleft = (100, 100)
@@ -80,18 +80,7 @@ class Eindein(pygame.sprite.Sprite):
             self.image = self.sprite_d[int(self.atual2)]
             self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
             
-
-    def pular(self, direcao):
+    def pular(self):
         if not self.pulando:
-            self.vel_y = -25
+            self.vel_y = -30
             self.pulando = True
-
-        elif direcao == "esquerda":
-            self.rect.x -= self.velocidade
-
-            self.atual3 = self.atual3 + 0.15
-            if self.atual3 >= len(self.sprite_pe):
-                self.atual3 = 0
-                self.animar = False
-            self.image = self.sprite_pe[int(self.atual1)]
-            self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))

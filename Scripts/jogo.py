@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
+from enemy import Goblin
 
 pygame.init()
 
@@ -18,6 +19,7 @@ fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
 sprites = pygame.sprite.Group()
 eindein = Eindein()
+goblin = Goblin(2000, 530)
 sprites.add(eindein)
 
 relógio = pygame.time.Clock()
@@ -55,6 +57,15 @@ while True:
         tela.blit(fundo_img, (x, 0))
 
     tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
-
+    tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
     sprites.update()
+    goblin.update()
+
+    goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+
+    if eindein.rect.colliderect(goblin_hitbox_tela):
+        print("você morreu")
+        pygame.quit()
+        exit()
+    sprites.draw(tela)
     pygame.display.flip()
