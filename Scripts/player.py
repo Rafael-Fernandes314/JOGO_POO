@@ -2,48 +2,48 @@ import pygame
 from pygame.locals import *
 from typing import List
 
-
 pygame.init()
 
-class Eindein(pygame.sprite.Sprite):
-
+class Eindein(pygame.sprite.Sprite):  # o player
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
+        # carrega a imagem dele e muda o tamanho
         self.image = pygame.image.load("Assets/Sprites/Player/Eidein-parado-e.png")
         self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
 
-        self.vel_y = 0
-        self.pulando = False
-        self.gravidade = 2
-        self.velocidade = 3
-        self.animar = False
-        
+        # física do personagem
+        self.vel_y = 0  # velocidade na vertical
+        self.pulando = False # para quando pular
+        self.gravidade = 2  # gravidade pra quando cair
+        self.velocidade = 3 # velocidade na horizontal
+        self.animar = False # pra quando for animar
+        self.vida = 3   # vida
+        self.atacando = False # quando for atacar
 
-        self.sprite_e:List[Eindein] = []
-        self.sprite_d:List[Eindein] = []
-        self.sprite_pe:List[Eindein] = []
+        # listas dos sprites pra animar
+        self.sprite_e:List[Eindein] = []  # Esquerda
+        self.sprite_d:List[Eindein] = []  # Direita
 
+        # andar pra esquerda
         self.sprite_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-parado-e.png"))
         self.sprite_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-e1.png"))
         self.sprite_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-e2.png"))
         self.sprite_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-e3.png"))
         self.sprite_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-e4.png"))
 
+        # andar pra direita
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-parado-d.png"))
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d1.png"))
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d2.png"))
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d3.png"))
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d4.png"))
 
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e1.png"))
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e2.png"))
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e3.png"))
-        self.sprite_pe.append(pygame.image.load("Assets/Sprites/Player/Eidein-pulando-e4.png"))
-
+        # primeiros frames
         self.atual1 = 0
         self.atual2 = 0
-        self.atual3 = 0
+
+        # imagem atual e a posição dela
         self.image = self.sprite_e[self.atual1]
         self.image = self.sprite_d[self.atual2]
         self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
@@ -51,36 +51,47 @@ class Eindein(pygame.sprite.Sprite):
         self.rect.topleft = (100, 100)
 
     def update(self):
+        # usa a gravidade
         self.vel_y += self.gravidade
         self.rect.y += self.vel_y
 
+        # coloca o personagem no chão
         if self.rect.bottom >= 515:
             self.rect.bottom = 515
             self.pulando = False
-        
-    def mover(self, direcao):
-        self.animar = True
-        if direcao == "esquerda":
-            self.rect.x -= self.velocidade
 
-            self.atual1 = self.atual1 + 0.15
+    def atacar(self):
+        # ele ataca
+        self.atacando = True
+
+    def mover(self, direcao):
+        # ele anima
+        self.animar = True
+
+        if direcao == "esquerda":
+            self.rect.x -= self.velocidade # move o personagem no eixo x pra a esquerda
+            self.atual1 = self.atual1 + 0.15 # avança a animação da esquerda
+            # no fim da lista, reinicia
             if self.atual1 >= len(self.sprite_e):
                 self.atual1 = 0
-                self.animar = False
+                self.animar = False  # para de animar
+            # atualiza a imagem
             self.image = self.sprite_e[int(self.atual1)]
             self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
-            
-        elif direcao == "direita":
-            self.rect.x += self.velocidade
 
-            self.atual2 = self.atual2 + 0.15
+        elif direcao == "direita":
+            self.rect.x += self.velocidade # move o personagem no eixo x pra a direita
+            self.atual2 = self.atual2 + 0.15 # avança a animação da direita
+            # no fim da lista, reinicia
             if self.atual2 >= len(self.sprite_d):
                 self.atual2 = 0
-                self.animar = False
+                self.animar = False  # para de animar
+            # atualiza a imagem
             self.image = self.sprite_d[int(self.atual2)]
             self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
-            
+
     def pular(self):
+        # permite pular se não tiver pulando
         if not self.pulando:
-            self.vel_y = -30
-            self.pulando = True
+            self.vel_y = -30  # sobe pra cima
+            self.pulando = True  # o player tá no ar
