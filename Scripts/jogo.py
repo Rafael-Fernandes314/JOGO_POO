@@ -17,7 +17,13 @@ PRETO = (0, 0, 0)
 tela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption("Herdeiros do Fim")
 
-# carrega o fundoo
+coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
+coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
+
+coração_preto = pygame.image.load("Assets/Sprites/UI/coração2.png")
+coração_preto = pygame.transform.scale(coração_preto, (120, 120))
+
+# carrega o fundo
 fundo_img = pygame.image.load("Assets/Sprites/Cenários/fundo teste.png").convert()
 fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
@@ -52,9 +58,6 @@ while True:
     # movimentação e rolagem da câmera
     if teclas[K_a]:
         eindein.mover("esquerda")
-        if eindein.rect.left <= 200:
-            scroll_x -= 5
-            eindein.rect.left = 200
 
     elif teclas[K_d]:
         eindein.mover("direita")
@@ -77,10 +80,17 @@ while True:
     # colisão entre player e goblin
     goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
     if eindein.rect.colliderect(goblin_hitbox_tela):
-        print("você morreu")
-        pygame.quit()
-        exit()
+        eindein.levar_dano()
 
+    for i in range(3):
+        if i < eindein.vida:
+            tela.blit(coração_vermelho, (10 + i * 70, 10))
+        else:
+            tela.blit(coração_preto, (10 + i * 70, 10))
+
+    if eindein.vida == 0:
+        eindein.morrer()
+        
     # desenha todos os sprites
     sprites.draw(tela)
     pygame.display.flip()  # atualiza a tela

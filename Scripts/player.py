@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from typing import List
+from sys import exit
 
 pygame.init()
 
@@ -20,6 +21,8 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.animar = False # pra quando for animar
         self.vida = 3   # vida
         self.atacando = False # quando for atacar
+        self.invencivel = False
+        self.invencivel_timer = 0
 
         # listas dos sprites pra animar
         self.sprite_e:List[Eindein] = []  # Esquerda
@@ -60,6 +63,12 @@ class Eindein(pygame.sprite.Sprite):  # o player
             self.rect.bottom = 515
             self.pulando = False
 
+        if self.invencivel:
+            self.invencivel_timer += 1
+            if self.invencivel_timer > 60:  # 1 segundo de invencibilidade a 60 FPS
+                self.invencivel = False
+                self.invencivel_timer = 0
+
     def atacar(self):
         # ele ataca
         self.atacando = True
@@ -95,3 +104,15 @@ class Eindein(pygame.sprite.Sprite):  # o player
         if not self.pulando:
             self.vel_y = -30  # sobe pra cima
             self.pulando = True  # o player tá no ar
+
+    def levar_dano(self):
+        if not self.invencivel:
+            self.vida -= 1
+            if self.vida < 0:
+                self.vida = 0
+            self.invencivel = True
+
+    def morrer(self):
+        if self.vida == 0:
+            pygame.quit()
+            exit()
