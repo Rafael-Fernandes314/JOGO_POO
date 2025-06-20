@@ -57,7 +57,8 @@ while True:
 
     # movimentação e rolagem da câmera
     if teclas[K_a]:
-        eindein.mover("esquerda")
+        if eindein.rect.left > 0 or scroll_x <= 0:
+            eindein.mover("esquerda")
 
     elif teclas[K_d]:
         eindein.mover("direita")
