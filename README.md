@@ -4,12 +4,12 @@
 
 Neste jogo, você controla personagens em um mundo repleto de fases, inimigos e desafios, com o objetivo de encontrar artefatos escondidos e restaurar a paz.
 
-## 🛠 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - Python 3.11.9
 - Pygame 2.6.1
 
-## 🚀 Como Rodar o Projeto
+## Como Rodar o Projeto
 
 1. Clone o repositório:
 
@@ -30,6 +30,6 @@ Neste jogo, você controla personagens em um mundo repleto de fases, inimigos e 
 - Rafael Fernandes Martins
 - Michel Jackson Bezerra
 
-## 📄 Documentação Completa
+## Documentação Completa
 
 Acesse o cronograma de desenvolvimento, funcionalidades e estrutura de pastas na Wiki do projeto: https://github.com/Rafael-Fernandes314/JOGO_POO/wiki
