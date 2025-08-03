@@ -18,7 +18,7 @@ def Game_over():
     tela = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption("Herdeiros do Fim - Game Over")
 
-    fundo_img = pygame.image.load("Assets/Sprites/UI/fundo teste.png").convert()
+    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fundo teste.png").convert()
     fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     morte = pygame.image.load("Assets/Sprites/UI/game-over.png")

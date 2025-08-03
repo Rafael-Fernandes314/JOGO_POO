@@ -97,7 +97,7 @@ def jogar_fase_1():
 
         if eindein.vida == 0:
             pygame.mixer.music.stop()
-            eindein.game_over()
+            return
             
         # desenha todos os sprites
         sprites.draw(tela)
