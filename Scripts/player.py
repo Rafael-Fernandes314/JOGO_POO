@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from typing import List
 from sys import exit
+from gameover import Game_over
 
 pygame.init()
 
@@ -114,5 +115,4 @@ class Eindein(pygame.sprite.Sprite):  # o player
 
     def morrer(self):
         if self.vida == 0:
-            pygame.quit()
-            exit()
+            Game_over
