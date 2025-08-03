@@ -24,6 +24,7 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.atacando = False # quando for atacar
         self.invencivel = False
         self.invencivel_timer = 0
+        self.game_over = False
 
         # listas dos sprites pra animar
         self.sprite_e:List[Eindein] = []  # Esquerda
@@ -113,6 +114,6 @@ class Eindein(pygame.sprite.Sprite):  # o player
                 self.vida = 0
             self.invencivel = True
 
-    def morrer(self):
+    def game_over(self):
         if self.vida == 0:
-            Game_over
+            self.game_over = True
