@@ -1,1 +1,3 @@
+# Dependências
 
+pygame == 2.6.1
