@@ -26,7 +26,7 @@ def Game_over():
     rect = morte.get_rect(center=(largura / 2, altura / 2.8))
 
     # fonte para o texto
-    fonte = pygame.font.Font("Assets/Fontes/PixelifySans-VariableFont_wght.ttf", 50)
+    fonte = pygame.font.Font("Assets/Fontes/PixelifySans-VariableFont_wght.ttf", 40)
     texto = fonte.render('Pressione "Espaço" para tentar novamente', True, BRANCO)
     rect_texto = texto.get_rect(center=(largura // 2, altura // 2 + 200))
 
@@ -50,7 +50,7 @@ def Game_over():
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
                     pygame.mixer.music.stop()
-                    return
+                    return True
 
         tela.blit(fundo_img, (0,0))
         tempo = pygame.time.get_ticks() / 1000

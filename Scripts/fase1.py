@@ -36,7 +36,7 @@ def jogar_fase_1():
     # sprites
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
-    goblin = Goblin(2000, 530)     # cria um goblin
+    goblin = Goblin(2000, 530)
     sprites.add(eindein)          # adiciona o jogador no grupo de sprites
 
     relógio = pygame.time.Clock()
