@@ -10,7 +10,6 @@ def jogar_fase_1():
     # tamanho da tela
     largura = 1020
     altura = 680
-    teste = 0
 
     # cor do fundo
     PRETO = (0, 0, 0)
