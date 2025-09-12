@@ -53,7 +53,7 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.image = self.sprite_d[self.atual2]
         self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
         self.rect = self.image.get_rect()
-        self.rect.topleft = (100, 100)
+        self.rect.topleft = (100, 535)
 
     def update(self):
         # usa a gravidade
