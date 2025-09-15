@@ -36,11 +36,21 @@ def jogar_fase_1():
     # sprites
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
-    goblin = Goblin(2000, 530)
-    sprites.add(eindein)          # adiciona o jogador no grupo de sprites
+    # lista de goblins
+    goblins = [
+        Goblin(2500, 530),
+        Goblin(5000, 530),
+        Goblin(7500, 530),
+        Goblin(10000, 530),
+        Goblin(12500, 530),
+        Goblin(15000, 530),
+        Goblin(17500, 530),
+    ]
+    sprites.add(eindein)
 
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
+    cenario_largura = 20000 # tamanho do cenário
 
     # loop do jogo
     while True:
@@ -68,26 +78,34 @@ def jogar_fase_1():
 
         elif teclas[K_d]:
             eindein.mover("direita")
-            if eindein.rect.left >= 200:
+            if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                 scroll_x += 5
                 eindein.rect.left = 200
 
-        # repete a imagem de fundo
-        for i in range(-1, largura // fundo_img.get_width() + 3):
-            x = i * fundo_img.get_width() - (scroll_x % fundo_img.get_width())
+        # desenha o cenário
+        for i in range(cenario_largura // fundo_img.get_width() + 1):
+            x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
             
         # desenha o player e o inimigo com base no fundo
         tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
-        tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-
         sprites.update() # atualiza o grupo de sprites
-        goblin.update()  # atualiza o movimento do goblin
 
-        # colisão entre player e goblin
-        goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-        if eindein.rect.colliderect(goblin_hitbox_tela):
-            eindein.levar_dano()
+        # desenha e atualiza todos os goblins
+        for goblin in goblins:
+            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
+            goblin.update()
+
+            # colisão entre player e goblin
+            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+            if eindein.rect.colliderect(goblin_hitbox_tela):
+                eindein.levar_dano()
+
+        for goblin in goblins[:]:  # evita bug ao remover
+            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
+            goblin.update()
+
+            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
 
         for i in range(3):
             if i < eindein.vida:
@@ -97,6 +115,7 @@ def jogar_fase_1():
 
         if eindein.vida == 0:
             pygame.mixer.music.stop()
+            return
             
         # desenha todos os sprites
         sprites.draw(tela)
