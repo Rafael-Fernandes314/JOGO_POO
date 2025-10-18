@@ -14,12 +14,12 @@ def Game_over():
     PRETO = (0, 0, 0)
     BRANCO = (255, 255, 255)
 
+    fadein = True
+    fade_alpha = 255
+
     # cria a tela e título do jogo
     tela = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption("Herdeiros do Fim - Game Over")
-
-    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fundo teste.png").convert()
-    fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     morte = pygame.image.load("Assets/Sprites/UI/game-over.png")
     morte = pygame.transform.scale(morte, (610, 360))
@@ -52,7 +52,6 @@ def Game_over():
                     pygame.mixer.music.stop()
                     return True
 
-        tela.blit(fundo_img, (0,0))
         tempo = pygame.time.get_ticks() / 1000
         offset_y = math.sin(tempo * 2) * 10
         rect_logo_animado = rect.copy()
@@ -62,5 +61,14 @@ def Game_over():
 
         if (pygame.time.get_ticks() // 500) % 2 == 0:
             tela.blit(texto, rect_texto)
+
+        if fadein:
+            fadein = pygame.Surface((largura,altura))
+            fadein.fill((0,0,0))
+            fadein.set_alpha(fade_alpha)
+            tela.blit(fadein,(0,0))
+            fade_alpha -= 5
+            if fade_alpha <= 0:
+                fadein = False
 
         pygame.display.flip()

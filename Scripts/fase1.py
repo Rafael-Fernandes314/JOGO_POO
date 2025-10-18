@@ -127,6 +127,8 @@ def jogar_fase_1():
 
         if eindein.vida == 0:
             pygame.mixer.music.stop()
+            from gameover import Game_over
+            Game_over()
             return
         
         if fadein:
