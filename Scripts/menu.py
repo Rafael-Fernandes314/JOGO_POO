@@ -3,7 +3,20 @@ from pygame.locals import *
 from sys import exit
 import math
 
+def fade(tela, largura, altura, fundo_img, logo, rect_logo_animado, texto, rect_texto):
+    fade = pygame.Surface((largura, altura))
+    fade.fill((0, 0, 0))
+    for i in range(0, 255, 5):
+        fade.set_alpha(i)
+        tela.blit(fundo_img, (0,0))
+        tela.blit(logo, rect_logo_animado)
+        tela.blit(texto, rect_texto)
+        tela.blit(fade, (0,0))
+        pygame.display.update()
+        pygame.time.delay(5)
+
 def mostrar_menu():
+    
     pygame.init()
 
     # tamanho da tela
@@ -31,9 +44,12 @@ def mostrar_menu():
     rect_texto = texto.get_rect(center=(largura // 2, altura // 2 + 200))
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/música-menu.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/menu.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
+
+    iniciar = pygame.mixer.Sound("Assets/Sons/Efeitos/botão_iniciar.mp3")
+    iniciar.set_volume(0.8)
 
     relógio = pygame.time.Clock()
 
@@ -49,7 +65,11 @@ def mostrar_menu():
                 exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
+                    iniciar.play()
                     pygame.mixer.music.stop()
+                    fade(tela, largura, altura, fundo_img, logo, rect_logo_animado, texto, rect_texto)
+                    from fase1 import jogar_fase_1
+                    jogar_fase_1()
                     return
 
         tela.blit(fundo_img, (0,0))

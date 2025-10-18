@@ -31,7 +31,7 @@ def Game_over():
     rect_texto = texto.get_rect(center=(largura // 2, altura // 2 + 200))
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/game-over-musica.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/gameover.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 

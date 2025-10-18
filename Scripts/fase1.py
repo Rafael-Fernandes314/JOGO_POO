@@ -4,6 +4,15 @@ from sys import exit
 from player import Eindein
 from enemy import Goblin
 
+def fade(tela, largura, altura):
+    fade = pygame.Surface((largura, altura))
+    fade.fill((0, 0, 0))
+    for i in range(0, 300):
+        fade.set_alpha(i)
+        tela.blit(fade, (0, 0))
+        pygame.display.update()
+        pygame.time.delay(3)
+
 def jogar_fase_1():
     pygame.init()
 
@@ -19,9 +28,12 @@ def jogar_fase_1():
     pygame.display.set_caption("Herdeiros do Fim")
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/fase_1-música.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/fase1.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
+
+    pulo = pygame.mixer.Sound("Assets/Sons/Efeitos/pulo.mp3")
+    pulo.set_volume(0.5)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -50,7 +62,10 @@ def jogar_fase_1():
 
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 20000 # tamanho do cenário
+    cenario_largura = 3000 # tamanho do cenário
+
+    fadein = True
+    fade_alpha = 255
 
     # loop do jogo
     while True:
@@ -67,6 +82,7 @@ def jogar_fase_1():
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
                     eindein.pular()
+                    pulo.play()
 
         # teclas que tão sendo seguradas
         teclas = pygame.key.get_pressed()
@@ -90,22 +106,18 @@ def jogar_fase_1():
         # desenha o player e o inimigo com base no fundo
         tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
         sprites.update() # atualiza o grupo de sprites
+        # desenha todos os sprites
+        sprites.draw(tela)
 
         # desenha e atualiza todos os goblins
-        for goblin in goblins:
+        for goblin in goblins[:]:
             tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
             goblin.update()
 
-            # colisão entre player e goblin
+            # contato entre o player e o goblin
             goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
             if eindein.rect.colliderect(goblin_hitbox_tela):
                 eindein.levar_dano()
-
-        for goblin in goblins[:]:  # evita bug ao remover
-            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-            goblin.update()
-
-            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
 
         for i in range(3):
             if i < eindein.vida:
@@ -116,7 +128,22 @@ def jogar_fase_1():
         if eindein.vida == 0:
             pygame.mixer.music.stop()
             return
+        
+        if fadein:
+            fadein = pygame.Surface((largura,altura))
+            fadein.fill((0,0,0))
+            fadein.set_alpha(fade_alpha)
+            tela.blit(fadein,(0,0))
+            fade_alpha -= 5
+            if fade_alpha <= 0:
+                fadein = False
             
-        # desenha todos os sprites
-        sprites.draw(tela)
         pygame.display.flip()  # atualiza a tela
+
+        # final da fase
+        if eindein.rect.x + scroll_x >= 3000:
+            pygame.mixer.music.stop()
+            fade(tela,largura,altura)
+            from fase2 import jogar_fase_2
+            jogar_fase_2()
+            return  # sai da fase 1
