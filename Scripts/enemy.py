@@ -24,7 +24,7 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
         self.vida = 2   # vida do goblin
 
         # hitbox usada pra colisão
-        self.hitbox = pygame.Rect(0, 0, (120 * 0.6), (120 * 0.7))
+        self.hitbox = pygame.Rect(0, 0, (128), (128))
         self.update_hitbox() # atualiza a hitbox com a posição atual dele
 
     def update_hitbox(self):
@@ -33,8 +33,8 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
 
     def update(self):
         # pra o goblin ficar no chão
-        if self.rect.bottom >= 530:
-            self.rect.bottom = 530
+        if self.rect.bottom >= 523:
+            self.rect.bottom = 523
 
         # movimento automático
         self.rect.x += self.velocidade * self.direcao
@@ -46,3 +46,36 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
     def levar_dano(self):
         # tira a vida do goblin
         self.vida -= 1
+
+class Ladrão(Goblin):
+    def __init__(self, largura, altura):
+        super().__init__(largura, altura)
+
+        self.image = pygame.image.load("Assets/Sprites/Inimigos/ladrão.png")
+        self.image = pygame.transform.scale(self.image, (32*4, 32*4))
+
+        self.alcance = 400
+        self.velocidade = 4
+
+        self.hitbox = pygame.Rect(0, 0, (128), (128))
+
+class GoblinV(Goblin):
+    def __init__(self, largura, altura):
+        super().__init__(largura, altura)
+
+        self.image = pygame.image.load("Assets/Sprites/Inimigos/goblin vermelho.png")
+        self.image = pygame.transform.scale(self.image, (32*4, 32*4))
+        
+        self.velocidade = 8
+        self.alcance = 100
+
+    def update(self):
+        if self.rect.bottom >= 520:
+            self.rect.bottom = 520
+
+        # movimento automático
+        self.rect.x += self.velocidade * self.direcao
+        if abs(self.rect.x - self.início_x) > self.alcance:
+            self.direcao = self.direcao * -1  # inverte a direção do goblin
+
+        self.update_hitbox()  # mantém a hitbox atualizada

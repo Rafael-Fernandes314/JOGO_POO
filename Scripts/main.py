@@ -8,6 +8,7 @@ def main():
     while jogando:
         mostrar_menu()
         jogar_fase_1()
+        jogar_fase_2()
         jogando = Game_over()
 
 if __name__ == "__main__":

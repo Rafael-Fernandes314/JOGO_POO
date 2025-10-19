@@ -2,7 +2,16 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Goblin
+from enemy import Ladrão
+
+def fade(tela, largura, altura):
+    fade = pygame.Surface((largura, altura))
+    fade.fill((0, 0, 0))
+    for i in range(0, 255):
+        fade.set_alpha(i)
+        tela.blit(fade, (0, 0))
+        pygame.display.update()
+        pygame.time.delay(3)
 
 def jogar_fase_2():
     pygame.init()
@@ -40,14 +49,14 @@ def jogar_fase_2():
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    goblins = [
-        Goblin(2500, 530),
-        Goblin(5000, 530),
-        Goblin(7500, 530),
-        Goblin(10000, 530),
-        Goblin(12500, 530),
-        Goblin(15000, 530),
-        Goblin(17500, 530),
+    ladrões = [
+        Ladrão(2500, 530),
+        Ladrão(5000, 530),
+        Ladrão(7500, 530),
+        Ladrão(10000, 530),
+        Ladrão(12500, 530),
+        Ladrão(15000, 530),
+        Ladrão(17500, 530),
     ]
     sprites.add(eindein)
 
@@ -103,14 +112,14 @@ def jogar_fase_2():
         # desenha todos os sprites
         sprites.draw(tela)
 
-        # desenha e atualiza todos os goblins
-        for goblin in goblins[:]:
-            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-            goblin.update()
+        # desenha e atualiza todos os ladrões
+        for ladrão in ladrões[:]:
+            tela.blit(ladrão.image, (ladrão.rect.x - scroll_x, ladrão.rect.y))
+            ladrão.update()
 
-            # contato entre o player e o goblin
-            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-            if eindein.rect.colliderect(goblin_hitbox_tela):
+            # contato entre o player e o ladrão
+            ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
+            if eindein.rect.colliderect(ladrão_hitbox_tela):
                 eindein.levar_dano()
 
         for i in range(3):
@@ -121,6 +130,8 @@ def jogar_fase_2():
 
         if eindein.vida == 0:
             pygame.mixer.music.stop()
+            from gameover import Game_over
+            Game_over()
             return
         
         if fadein:
@@ -133,3 +144,10 @@ def jogar_fase_2():
                 fadein = False
         
         pygame.display.flip()  # atualiza a tela
+
+        if eindein.rect.x + scroll_x >= 3000:
+            pygame.mixer.music.stop()
+            fade(tela,largura,altura)
+            from fase3 import jogar_fase_3
+            jogar_fase_3()
+            return

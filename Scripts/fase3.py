@@ -2,18 +2,9 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Goblin
+from enemy import GoblinV
 
-def fade(tela, largura, altura):
-    fade = pygame.Surface((largura, altura))
-    fade.fill((0, 0, 0))
-    for i in range(0, 255):
-        fade.set_alpha(i)
-        tela.blit(fade, (0, 0))
-        pygame.display.update()
-        pygame.time.delay(3)
-
-def jogar_fase_1():
+def jogar_fase_3():
     pygame.init()
 
     # tamanho da tela
@@ -28,7 +19,7 @@ def jogar_fase_1():
     pygame.display.set_caption("Herdeiros do Fim")
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/fase1.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/fase3.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
@@ -42,7 +33,7 @@ def jogar_fase_1():
     coração_preto = pygame.transform.scale(coração_preto, (120, 120))
 
     # carrega o fundo
-    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fundo teste.png").convert()
+    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase3.png").convert()
     fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     # sprites
@@ -50,13 +41,13 @@ def jogar_fase_1():
     eindein = Eindein()            # cria um jogador
     # lista de goblins
     goblins = [
-        Goblin(2500, 530),
-        Goblin(5000, 530),
-        Goblin(7500, 530),
-        Goblin(10000, 530),
-        Goblin(12500, 530),
-        Goblin(15000, 530),
-        Goblin(17500, 530),
+        GoblinV(2500, 530),
+        GoblinV(5000, 530),
+        GoblinV(7500, 530),
+        GoblinV(10000, 530),
+        GoblinV(12500, 530),
+        GoblinV(15000, 530),
+        GoblinV(17500, 530),
     ]
     sprites.add(eindein)
 
@@ -64,13 +55,16 @@ def jogar_fase_1():
     scroll_x = 0  # controla a mudança da câmera
     cenario_largura = 3000 # tamanho do cenário
 
+    tela.blit(fundo_img, (0, 0))
+    pygame.display.flip()
+
     fadein = True
     fade_alpha = 255
 
     # loop do jogo
     while True:
         relógio.tick(60) # 60 fps
-        tela.fill(PRETO) # limpa a tela
+        tela.fill(PRETO)
 
         # eventos do jogo
         for event in pygame.event.get():
@@ -139,13 +133,5 @@ def jogar_fase_1():
             fade_alpha -= 5
             if fade_alpha <= 0:
                 fadein = False
-            
+        
         pygame.display.flip()  # atualiza a tela
-
-        # final da fase
-        if eindein.rect.x + scroll_x >= 3000:
-            pygame.mixer.music.stop()
-            fade(tela,largura,altura)
-            from fase2 import jogar_fase_2
-            jogar_fase_2()
-            return  # sai da fase 1
