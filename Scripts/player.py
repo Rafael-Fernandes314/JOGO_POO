@@ -25,7 +25,6 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.invencivel_timer = 0
         self.gameover = False
         self.hitbox = pygame.Rect(0, 0, (20), (128))
-        self.update_hitbox()
 
         # listas dos sprites pra animar
         self.sprite_e:List[Eindein] = []  # Esquerda
@@ -56,10 +55,6 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.rect = self.image.get_rect()
         self.rect.topleft = (100, 535)
 
-    def update_hitbox(self):
-        # alinha a hitbox no centro do sprite
-        self.hitbox.center = self.rect.center
-
     def update(self):
         # usa a gravidade
         self.vel_y += self.gravidade
@@ -75,7 +70,6 @@ class Eindein(pygame.sprite.Sprite):  # o player
             if self.invencivel_timer > 60:  # 1 segundo de invencibilidade a 60 FPS
                 self.invencivel = False
                 self.invencivel_timer = 0
-        self.update_hitbox()
 
     def atacar(self):
         # ele ataca

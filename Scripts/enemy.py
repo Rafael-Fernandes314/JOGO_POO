@@ -8,9 +8,15 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
         pygame.sprite.Sprite.__init__(self)
 
         # carrega e redimensiona as imagens do goblin
-        self.image = pygame.image.load("Assets/Sprites/Inimigos/goblin verde.png")
-        self.image = pygame.transform.scale(self.image, (32*4, 32*4))
+        image = pygame.image.load("Assets/Sprites/Inimigos/goblin verde.png")
+        image = pygame.transform.scale(image, (32 * 4, 32 * 4))
 
+        # cria versões virada e normal
+        self.imaged = image
+        self.imagee = pygame.transform.flip(image, True, False)
+
+        self.image = self.imaged
+    
         # define a posição do goblin com base no canto inferior esquerdo
         self.rect = self.image.get_rect()
         self.rect.bottomleft = (largura, altura)
@@ -27,6 +33,9 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
         self.hitbox = pygame.Rect(0, 0, (20), (128))
         self.update_hitbox() # atualiza a hitbox com a posição atual dele
 
+        if self.direcao == -1:
+            self.virar()
+
     def update_hitbox(self):
         # alinha a hitbox no centro do sprite
         self.hitbox.center = self.rect.center
@@ -39,9 +48,16 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
         # movimento automático
         self.rect.x += self.velocidade * self.direcao
         if abs(self.rect.x - self.início_x) > self.alcance:
-            self.direcao = self.direcao * -1  # inverte a direção do goblin
+            self.direcao *= -1
+            self.virar()
 
         self.update_hitbox()  # mantém a hitbox atualizada
+    
+    def virar(self):
+        if self.direcao == -1:
+            self.image = self.imagee
+        else:
+            self.image = self.imaged
 
     def levar_dano(self):
         # tira a vida do goblin
@@ -54,6 +70,10 @@ class Ladrão(Goblin):
         self.image = pygame.image.load("Assets/Sprites/Inimigos/ladrão.png")
         self.image = pygame.transform.scale(self.image, (32*4, 32*4))
 
+        self.imaged = self.image
+        self.imagee = pygame.transform.flip(self.image, True, False)
+        self.image = self.imaged
+
         self.alcance = 400
         self.velocidade = 4
 
@@ -65,6 +85,10 @@ class GoblinV(Goblin):
 
         self.image = pygame.image.load("Assets/Sprites/Inimigos/goblin vermelho.png")
         self.image = pygame.transform.scale(self.image, (32*4, 32*4))
+
+        self.imaged = self.image
+        self.imagee = pygame.transform.flip(self.image, True, False)
+        self.image = self.imaged
         
         self.velocidade = 8
         self.alcance = 100
@@ -76,6 +100,5 @@ class GoblinV(Goblin):
         # movimento automático
         self.rect.x += self.velocidade * self.direcao
         if abs(self.rect.x - self.início_x) > self.alcance:
-            self.direcao = self.direcao * -1  # inverte a direção do goblin
-
-        self.update_hitbox()  # mantém a hitbox atualizada
+            self.direcao *= -1  # inverte a direção do goblin
+            self.virar()

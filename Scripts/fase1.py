@@ -111,7 +111,7 @@ def jogar_fase_1():
         # desenha todos os sprites
         sprites.draw(tela)
 
-        tela.blit(artefato.image, (eindein.rect.x, eindein.rect.y))
+        tela.blit(artefato.image, (artefato.rect.x, artefato.rect.y))
         artefato.update()
 
         # desenha e atualiza todos os goblins
@@ -121,7 +121,7 @@ def jogar_fase_1():
 
             # contato entre o player e o goblin
             goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-            if eindein.hitbox(goblin_hitbox_tela):
+            if eindein.rect.colliderect(goblin_hitbox_tela):
                 eindein.levar_dano()
 
         for i in range(3):
