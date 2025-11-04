@@ -3,6 +3,7 @@ from pygame.locals import *
 from sys import exit
 from player import Eindein
 from enemy import Goblin
+from artefato import OrbeDoMar
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -58,6 +59,7 @@ def jogar_fase_1():
         Goblin(15000, 530),
         Goblin(17500, 530),
     ]
+    artefato = OrbeDoMar(2800, 500)
     sprites.add(eindein)
 
     relógio = pygame.time.Clock()
@@ -109,6 +111,9 @@ def jogar_fase_1():
         # desenha todos os sprites
         sprites.draw(tela)
 
+        tela.blit(artefato.image, (eindein.rect.x, eindein.rect.y))
+        artefato.update()
+
         # desenha e atualiza todos os goblins
         for goblin in goblins[:]:
             tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
@@ -116,7 +121,7 @@ def jogar_fase_1():
 
             # contato entre o player e o goblin
             goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-            if eindein.rect.colliderect(goblin_hitbox_tela):
+            if eindein.hitbox(goblin_hitbox_tela):
                 eindein.levar_dano()
 
         for i in range(3):

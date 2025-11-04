@@ -24,7 +24,7 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
         self.vida = 2   # vida do goblin
 
         # hitbox usada pra colisão
-        self.hitbox = pygame.Rect(0, 0, (128), (128))
+        self.hitbox = pygame.Rect(0, 0, (20), (128))
         self.update_hitbox() # atualiza a hitbox com a posição atual dele
 
     def update_hitbox(self):
