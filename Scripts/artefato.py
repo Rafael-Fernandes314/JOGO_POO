@@ -43,19 +43,19 @@ class Chave(Artefato):
 class Espada(Artefato):
     def __init__(self, largura, altura):
         self.image = pygame.image.load("Assets\Sprites\Arterfatos\espada.png")
-        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.image = pygame.transform.scale(self.image, (111, 108))
         super().__init__(largura, altura)
         
 class Escudo(Artefato):
     def __init__(self, largura, altura):
         self.image = pygame.image.load("Assets\Sprites\Arterfatos\escudo.png")
-        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.image = pygame.transform.scale(self.image, (108, 108))
         super().__init__(largura, altura)
 
 class Anel(Artefato):
     def __init__(self, largura, altura):
         self.image = pygame.image.load("Assets/Sprites/Arterfatos/anel.png")
-        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.image = pygame.transform.scale(self.image, (120, 72))
         super().__init__(largura, altura)
 
 class Emblema(Artefato):

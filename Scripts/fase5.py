@@ -3,7 +3,7 @@ from pygame.locals import *
 from sys import exit
 from player import Eindein
 from enemy import GoblinV
-from artefato import Orbe
+from artefato import Escudo
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -14,7 +14,7 @@ def fade(tela, largura, altura):
         pygame.display.update()
         pygame.time.delay(3)
 
-def jogar_fase_3():
+def jogar_fase_5():
     pygame.init()
 
     # tamanho da tela
@@ -45,7 +45,7 @@ def jogar_fase_3():
     coração_preto = pygame.transform.scale(coração_preto, (120, 120))
 
     # carrega o fundo
-    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase3.png").convert()
+    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase5.png").convert()
     fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     # sprites
@@ -62,7 +62,7 @@ def jogar_fase_3():
         GoblinV(17500, 530),
     ]
     sprites.add(eindein)
-    artefato = Orbe(2800, 500)
+    artefato = Escudo(2800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
     cenario_largura = 3000 # tamanho do cenário
@@ -161,6 +161,6 @@ def jogar_fase_3():
         if eindein.rect.x + scroll_x >= 3000:
             pygame.mixer.music.stop()
             fade(tela,largura,altura)
-            from fase4 import jogar_fase_4
-            jogar_fase_4()
+            from fase6 import jogar_fase_6
+            jogar_fase_6()
             return
