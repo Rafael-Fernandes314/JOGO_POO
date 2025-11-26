@@ -3,6 +3,7 @@ from pygame.locals import *
 from sys import exit
 from player import Eindein
 from enemy import GoblinV
+from artefato import Orbe
 
 def jogar_fase_3():
     pygame.init()
@@ -25,6 +26,8 @@ def jogar_fase_3():
 
     pulo = pygame.mixer.Sound("Assets/Sons/Efeitos/pulo.mp3")
     pulo.set_volume(0.5)
+    coletar = pygame.mixer.Sound("Assets/Sons/Efeitos/coletar_artefato.mp3")
+    coletar.set_volume(0.7)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -50,7 +53,7 @@ def jogar_fase_3():
         GoblinV(17500, 530),
     ]
     sprites.add(eindein)
-
+    artefato = Orbe(2800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
     cenario_largura = 3000 # tamanho do cenário
@@ -102,6 +105,16 @@ def jogar_fase_3():
         sprites.update() # atualiza o grupo de sprites
         # desenha todos os sprites
         sprites.draw(tela)
+
+        if artefato:
+            tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
+            artefato.update()
+
+            # colisão com o player
+            artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
+            if eindein.rect.colliderect(artefato_hitbox_tela):
+                coletar.play()
+                artefato = None
 
         # desenha e atualiza todos os goblins
         for goblin in goblins[:]:

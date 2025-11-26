@@ -3,7 +3,7 @@ from pygame.locals import *
 from sys import exit
 from player import Eindein
 from enemy import Goblin
-from artefato import OrbeDoMar
+from artefato import Chave
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -35,6 +35,8 @@ def jogar_fase_1():
 
     pulo = pygame.mixer.Sound("Assets/Sons/Efeitos/pulo.mp3")
     pulo.set_volume(0.5)
+    coletar = pygame.mixer.Sound("Assets/Sons/Efeitos/coletar_artefato.mp3")
+    coletar.set_volume(0.7)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -59,9 +61,8 @@ def jogar_fase_1():
         Goblin(15000, 530),
         Goblin(17500, 530),
     ]
-    artefato = OrbeDoMar(2800, 500)
+    artefato = Chave(2800, 500)
     sprites.add(eindein)
-
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
     cenario_largura = 3000 # tamanho do cenário
@@ -111,11 +112,18 @@ def jogar_fase_1():
         # desenha todos os sprites
         sprites.draw(tela)
 
-        tela.blit(artefato.image, (artefato.rect.x, artefato.rect.y))
-        artefato.update()
+        if artefato:
+            tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
+            artefato.update()
+
+            # colisão com o player
+            artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
+            if eindein.rect.colliderect(artefato_hitbox_tela):
+                coletar.play()
+                artefato = None
 
         # desenha e atualiza todos os goblins
-        for goblin in goblins[:]:
+        for goblin in goblins:
             tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
             goblin.update()
 
