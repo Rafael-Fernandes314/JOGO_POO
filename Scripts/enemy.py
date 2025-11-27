@@ -14,7 +14,6 @@ class Goblin(pygame.sprite.Sprite):  # define a classe do goblin
         # cria versões virada e normal
         self.imaged = image
         self.imagee = pygame.transform.flip(image, True, False)
-
         self.image = self.imaged
     
         # define a posição do goblin com base no canto inferior esquerdo
@@ -68,13 +67,14 @@ class Ladrão(Goblin):
         super().__init__(largura, altura)
 
         self.image = pygame.image.load("Assets/Sprites/Inimigos/ladrão.png")
-        self.image = pygame.transform.scale(self.image, (32*4, 32*4))
+        self.image = pygame.transform.scale(self.image, (128, 128))
 
         self.imaged = self.image
         self.imagee = pygame.transform.flip(self.image, True, False)
         self.image = self.imaged
 
         self.alcance = 400
+        self.vida = 3
         self.velocidade = 4
 
         self.hitbox = pygame.Rect(0, 0, (128), (128))
@@ -102,3 +102,37 @@ class GoblinV(Goblin):
         if abs(self.rect.x - self.início_x) > self.alcance:
             self.direcao *= -1  # inverte a direção do goblin
             self.virar()
+
+class Golem(Goblin):
+    def __init__(self, largura, altura):
+        super().__init__(largura, altura)
+
+        self.image = pygame.image.load("Assets/Sprites/Inimigos/golem.png")
+        self.image = pygame.transform.scale(self.image, (180, 180))
+
+        self.imaged = self.image
+        self.imagee = pygame.transform.flip(self.image, True, False)
+        self.image = self.imaged
+
+        self.rect = self.image.get_rect()
+        self.rect.bottomleft = (largura, altura)
+        self.início_x = largura
+
+        self.velocidade = 1.5
+        self.alcance = 100
+        self.vida = 5
+
+        self.hitbox = pygame.Rect(0, 0, 100, 120)
+        self.update_hitbox()
+
+    def update(self):
+        if self.rect.bottom >= 500:
+            self.rect.bottom = 500
+
+        self.rect.x += self.velocidade * self.direcao
+
+        if abs(self.rect.x - self.início_x) > self.alcance:
+            self.direcao *= -1
+            self.virar()
+
+        self.update_hitbox()

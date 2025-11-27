@@ -4,6 +4,8 @@ from sys import exit
 from player import Eindein
 from enemy import GoblinV
 from artefato import Orbe
+from hud import desenhar_hud
+from inventario import artefatos_coletados
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -123,6 +125,7 @@ def jogar_fase_3():
             artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
             if eindein.rect.colliderect(artefato_hitbox_tela):
                 coletar.play()
+                artefatos_coletados["orbe"] = True
                 artefato = None
 
         # desenha e atualiza todos os goblins
@@ -156,6 +159,7 @@ def jogar_fase_3():
             if fade_alpha <= 0:
                 fadein = False
         
+        desenhar_hud(tela, largura, altura)
         pygame.display.flip()  # atualiza a tela
 
         if eindein.rect.x + scroll_x >= 3000:

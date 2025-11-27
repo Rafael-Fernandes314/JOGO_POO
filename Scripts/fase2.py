@@ -3,6 +3,7 @@ from pygame.locals import *
 from sys import exit
 from player import Eindein
 from enemy import Ladrão
+from hud import desenhar_hud
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -143,6 +144,7 @@ def jogar_fase_2():
             if fade_alpha <= 0:
                 fadein = False
         
+        desenhar_hud(tela, largura, altura)
         pygame.display.flip()  # atualiza a tela
 
         if eindein.rect.x + scroll_x >= 3000:

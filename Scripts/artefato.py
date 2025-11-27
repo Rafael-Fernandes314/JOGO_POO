@@ -27,17 +27,17 @@ class Artefato(pygame.sprite.Sprite):
         self.rect.centery = self.base_y + desvio_y
 
         self.hitbox.center = self.rect.center
+        
+class Chave(Artefato):
+    def __init__(self, largura, altura):
+        self.image = pygame.image.load("Assets\Sprites\Arterfatos\chave.png")
+        self.image = pygame.transform.scale(self.image, (53, 96))
+        super().__init__(largura, altura)
 
 class Orbe(Artefato):
     def __init__(self, largura, altura):
         self.image = pygame.image.load("Assets\Sprites\Arterfatos\orbe.png")
         self.image = pygame.transform.scale(self.image, (109, 108))
-        super().__init__(largura, altura)
-        
-class Chave(Artefato):
-    def __init__(self, largura, altura):
-        self.image = pygame.image.load("Assets\Sprites\Arterfatos\chave.png")
-        self.image = pygame.transform.scale(self.image, (80, 144))
         super().__init__(largura, altura)
         
 class Espada(Artefato):

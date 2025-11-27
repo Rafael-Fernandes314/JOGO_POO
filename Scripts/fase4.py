@@ -2,8 +2,10 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import GoblinV
+from enemy import Golem
 from artefato import Espada
+from hud import desenhar_hud
+from inventario import artefatos_coletados
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -52,14 +54,14 @@ def jogar_fase_4():
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    goblins = [
-        GoblinV(2500, 530),
-        GoblinV(5000, 530),
-        GoblinV(7500, 530),
-        GoblinV(10000, 530),
-        GoblinV(12500, 530),
-        GoblinV(15000, 530),
-        GoblinV(17500, 530),
+    golens = [
+        Golem(2500, 530),
+        Golem(5000, 530),
+        Golem(7500, 530),
+        Golem(10000, 530),
+        Golem(12500, 530),
+        Golem(15000, 530),
+        Golem(17500, 530),
     ]
     sprites.add(eindein)
     artefato = Espada(2800, 500)
@@ -123,17 +125,17 @@ def jogar_fase_4():
             artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
             if eindein.rect.colliderect(artefato_hitbox_tela):
                 coletar.play()
+                artefatos_coletados["espada"] = True
                 artefato = None
 
         # desenha e atualiza todos os goblins
-        for goblin in goblins[:]:
-            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-            goblin.update()
+        for golem in golens[:]:
+            tela.blit(golem.image, (golem.rect.x - scroll_x, golem.rect.y))
+            golem.update()
 
-            # contato entre o player e o goblin
-            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-            if eindein.rect.colliderect(goblin_hitbox_tela):
-                eindein.levar_dano()
+            golem_hitbox_tela = golem.hitbox.move(-scroll_x, 0)
+            if eindein.rect.colliderect(golem_hitbox_tela):
+                eindein.levar_dano(2)
 
         for i in range(3):
             if i < eindein.vida:
@@ -156,6 +158,7 @@ def jogar_fase_4():
             if fade_alpha <= 0:
                 fadein = False
         
+        desenhar_hud(tela, largura, altura)
         pygame.display.flip()  # atualiza a tela
 
         if eindein.rect.x + scroll_x >= 3000:

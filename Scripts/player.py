@@ -107,12 +107,13 @@ class Eindein(pygame.sprite.Sprite):  # o player
             self.vel_y = -30  # sobe pra cima
             self.pulando = True  # o player tá no ar
 
-    def levar_dano(self):
+    def levar_dano(self, quantidade=1):
         if not self.invencivel:
-            self.vida -= 1
+            self.vida -= quantidade
             if self.vida < 0:
                 self.vida = 0
             self.invencivel = True
+            self.invencivel_timer = 0
 
     def game_over(self):
         if self.vida == 0:
