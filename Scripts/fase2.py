@@ -4,6 +4,7 @@ from sys import exit
 from player import Eindein
 from enemy import Ladrão
 from hud import desenhar_hud
+import estado_jogo
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -70,6 +71,7 @@ def jogar_fase_2():
 
     fadein = True
     fade_alpha = 255
+    estado_jogo.fase_atual = 2
 
     # loop do jogo
     while True:

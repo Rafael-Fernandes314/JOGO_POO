@@ -6,6 +6,7 @@ from enemy import GoblinV
 from artefato import Escudo
 from hud import desenhar_hud
 from inventario import artefatos_coletados
+import estado_jogo
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -74,6 +75,7 @@ def jogar_fase_5():
 
     fadein = True
     fade_alpha = 255
+    estado_jogo.fase_atual = 5
 
     # loop do jogo
     while True:

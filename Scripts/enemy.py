@@ -133,6 +133,7 @@ class Golem(Goblin):
 
         if abs(self.rect.x - self.início_x) > self.alcance:
             self.direcao *= -1
+            self.início_x = self.rect.x
             self.virar()
 
         self.update_hitbox()
