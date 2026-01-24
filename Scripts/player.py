@@ -12,11 +12,13 @@ class Eindein(pygame.sprite.Sprite):  # o player
         # carrega a imagem dele e muda o tamanho
         self.image = pygame.image.load("Assets/Sprites/Player/Eidein-parado-e.png")
         self.image = pygame.transform.scale(self.image, (128, 128))
+        self.sprite_agachar_e: List[pygame.Surface] = []
+        self.sprite_agachar_d: List[pygame.Surface] = []
 
         # física do personagem
-        self.vel_y = 0  # velocidade na vertical
+        self.vel_y = -12  # velocidade na vertical
         self.pulando = False # para quando pular
-        self.gravidade = 1.9  # gravidade pra quando cair
+        self.gravidade = 0.8  # gravidade pra quando cair
         self.velocidade = 3 # velocidade na horizontal
         self.animar = False # pra quando for animar
         self.vida = 3   # vida
@@ -44,6 +46,12 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d3.png"))
         self.sprite_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-andando-d4.png"))
 
+        self.sprite_agachar_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-agachado-d.png"))
+        self.sprite_agachar_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-agachado-e.png"))
+
+        self.agachado = False
+        self.direcao = "direita"
+
         # primeiros frames
         self.atual1 = 0
         self.atual2 = 0
@@ -56,56 +64,84 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.rect.topleft = (100, 535)
 
     def update(self):
-        # usa a gravidade
+        # gravidade
         self.vel_y += self.gravidade
         self.rect.y += self.vel_y
 
-        # coloca o personagem no chão
-        if self.rect.bottom >= 515:
-            self.rect.bottom = 515
+        # define o chão
+        chao = 530 if self.agachado else 510
+        if self.rect.bottom >= chao:
+            self.rect.bottom = chao
             self.pulando = False
+            self.vel_y = 0
 
+        # invencibilidade
         if self.invencivel:
             self.invencivel_timer += 1
-            if self.invencivel_timer > 60:  # 1 segundo de invencibilidade a 60 FPS
+            if self.invencivel_timer > 60:
                 self.invencivel = False
                 self.invencivel_timer = 0
+
+        # seleção de sprite
+        if self.agachado:
+            self.image = pygame.transform.scale(
+                self.sprite_agachar_d[0] if self.direcao == "direita" else self.sprite_agachar_e[0],
+                (140, 140)
+            )
+        else:
+            if self.animar:
+                if self.direcao == "direita":
+                    self.atual2 += 0.15
+                    if self.atual2 >= len(self.sprite_d):
+                        self.atual2 = 0
+                        self.animar = False
+                    self.image = pygame.transform.scale(self.sprite_d[int(self.atual2)], (32*4, 32*4))
+                else:
+                    self.atual1 += 0.15
+                    if self.atual1 >= len(self.sprite_e):
+                        self.atual1 = 0
+                        self.animar = False
+                    self.image = pygame.transform.scale(self.sprite_e[int(self.atual1)], (32*4, 32*4))
+            else:
+                self.image = pygame.transform.scale(
+                    self.sprite_d[0] if self.direcao == "direita" else self.sprite_e[0],
+                    (32*4, 32*4)
+                )
+
+        midbottom = self.rect.midbottom
+        self.rect = self.image.get_rect()
+        self.rect.midbottom = midbottom
+
+        if self.agachado:
+            self.hitbox.height = 64
+        else:
+            self.hitbox.height = 128
+        self.hitbox.width = 20
+        self.hitbox.midbottom = self.rect.midbottom
 
     def atacar(self):
         # ele ataca
         self.atacando = True
 
     def mover(self, direcao):
-        # ele anima
+        self.direcao = direcao
         self.animar = True
-
         if direcao == "esquerda":
-            self.rect.x -= self.velocidade # move o personagem no eixo x pra a esquerda
-            self.atual1 = self.atual1 + 0.15 # avança a animação da esquerda
-            # no fim da lista, reinicia
-            if self.atual1 >= len(self.sprite_e):
-                self.atual1 = 0
-                self.animar = False  # para de animar
-            # atualiza a imagem
-            self.image = self.sprite_e[int(self.atual1)]
-            self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
-
-        elif direcao == "direita":
-            self.rect.x += self.velocidade # move o personagem no eixo x pra a direita
-            self.atual2 = self.atual2 + 0.15 # avança a animação da direita
-            # no fim da lista, reinicia
-            if self.atual2 >= len(self.sprite_d):
-                self.atual2 = 0
-                self.animar = False  # para de animar
-            # atualiza a imagem
-            self.image = self.sprite_d[int(self.atual2)]
-            self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
+            self.rect.x -= self.velocidade
+        else:
+            self.rect.x += self.velocidade
 
     def pular(self):
-        # permite pular se não tiver pulando
-        if not self.pulando:
-            self.vel_y = -30  # sobe pra cima
-            self.pulando = True  # o player tá no ar
+        if not self.pulando and not self.agachado:
+            self.vel_y = -15
+            self.pulando = True
+
+    def agachar(self, estado: bool):
+        self.agachado = estado
+        if estado:
+            self.hitbox.height = 64
+        else:
+            self.hitbox.height = 128
 
     def levar_dano(self, quantidade=1):
         if not self.invencivel:

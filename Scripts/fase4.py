@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Golem
+from enemy import Golem, ExplosaoGolem
 from artefato import Espada
 from hud import desenhar_hud
 from inventario import artefatos_coletados
@@ -18,6 +18,7 @@ def fade(tela, largura, altura):
         pygame.time.delay(3)
 
 def jogar_fase_4():
+
     pygame.init()
 
     # tamanho da tela
@@ -53,16 +54,17 @@ def jogar_fase_4():
 
     # sprites
     sprites = pygame.sprite.Group()
-    eindein = Eindein()            # cria um jogador
+    grupo_projeteis = pygame.sprite.Group()
+    eindein = Eindein() # cria um jogador
     # lista de goblins
     golens = [
-        Golem(2500, 530),
-        Golem(5000, 530),
-        Golem(7500, 530),
-        Golem(10000, 530),
-        Golem(12500, 530),
-        Golem(15000, 530),
-        Golem(17500, 530),
+        Golem(2500, 530, grupo_projeteis, eindein),
+        Golem(5000, 530, grupo_projeteis, eindein),
+        Golem(7500, 530, grupo_projeteis, eindein),
+        Golem(10000, 530, grupo_projeteis, eindein),
+        Golem(12500, 530, grupo_projeteis, eindein),
+        Golem(15000, 530, grupo_projeteis, eindein),
+        Golem(17500, 530, grupo_projeteis, eindein),
     ]
     sprites.add(eindein)
     artefato = Espada(2800, 500)
@@ -98,23 +100,24 @@ def jogar_fase_4():
         teclas = pygame.key.get_pressed()
 
         # movimentação e rolagem da câmera
-        if teclas[K_a]:
-            if eindein.rect.left > 0 or scroll_x <= 0:
-                eindein.mover("esquerda")
-
-        elif teclas[K_d]:
-            eindein.mover("direita")
-            if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
-                scroll_x += 5
-                eindein.rect.left = 200
+        if teclas[K_s]:
+            eindein.agachar(True)
+        else:
+            eindein.agachar(False)
+            if teclas[K_a]:
+                if eindein.rect.left > 0 or scroll_x <= 0:
+                    eindein.mover("esquerda")
+            elif teclas[K_d]:
+                eindein.mover("direita")
+                if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
+                    scroll_x += 5
+                    eindein.rect.left = 200
 
         # desenha o cenário
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
             
-        # desenha o player e o inimigo com base no fundo
-        tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
         sprites.update() # atualiza o grupo de sprites
         # desenha todos os sprites
         sprites.draw(tela)
@@ -142,6 +145,17 @@ def jogar_fase_4():
 
             if golem.morreu():
                 golem.remove(golem)
+
+        grupo_projeteis.update()
+        for proj in grupo_projeteis:
+            tela.blit(proj.image, (proj.rect.x - scroll_x, proj.rect.y))
+            hitbox_tela = proj.hitbox.move(-scroll_x, 0)
+            if isinstance(proj, ExplosaoGolem):
+                if not hasattr(proj, "dano_aplicado"):
+                    proj.dano_aplicado = False
+                if hitbox_tela.colliderect(eindein.rect) and not proj.dano_aplicado:
+                    eindein.levar_dano(proj.dano)
+                    proj.dano_aplicado = True
 
         for i in range(3):
             if i < eindein.vida:

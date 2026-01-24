@@ -18,6 +18,7 @@ def fade(tela, largura, altura):
         pygame.time.delay(3)
 
 def jogar_fase_7():
+
     pygame.init()
 
     # tamanho da tela
@@ -98,65 +99,52 @@ def jogar_fase_7():
         teclas = pygame.key.get_pressed()
 
         # movimentação e rolagem da câmera
-        if teclas[K_a]:
-            if eindein.rect.left > 0 or scroll_x <= 0:
-                eindein.mover("esquerda")
+        if teclas[K_s]:
+            eindein.agachar(True)
+        else:
+            eindein.agachar(False)
+            if teclas[K_a]:
+                if eindein.rect.left > 0 or scroll_x <= 0:
+                    eindein.mover("esquerda")
+            elif teclas[K_d]:
+                eindein.mover("direita")
+                if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
+                    scroll_x += 5
+                    eindein.rect.left = 200
 
-        elif teclas[K_d]:
-            eindein.mover("direita")
-            if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
-                scroll_x += 5
-                eindein.rect.left = 200
-
-        # desenha o cenário
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
+
+        # desenha a aura dos xamãs por trás do player e inimigos
+        for xamã in xamãs:
+            xamã.update()
+            xamã.causar_dano(eindein, scroll_x)
+            xamã.desenhar_aura(tela, scroll_x)
+            tela.blit(xamã.image, (xamã.rect.x - scroll_x, xamã.rect.y))
             
-        # desenha o player e o inimigo com base no fundo
-        tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
-        sprites.update() # atualiza o grupo de sprites
-        # desenha todos os sprites
+        # desenha player
+        sprites.update()
         sprites.draw(tela)
 
+        # desenha artefatos
         if artefato:
             tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
             artefato.update()
-
-            # colisão com o player
             artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
             if eindein.rect.colliderect(artefato_hitbox_tela):
                 coletar.play()
                 artefatos_coletados["emblema"] = True
                 artefato = None
 
-        # desenha e atualiza todos os xamãs
-        for xama in xamãs:
-            tela.blit(xama.image, (xama.rect.x - scroll_x, xama.rect.y))
-            xama.update()
-
-            if xama.aura_ativa:
-                aura = pygame.Surface((xama.raio_aura * 2, xama.raio_aura * 2), pygame.SRCALPHA)
-                pygame.draw.circle(
-                    aura,
-                    (180, 0, 255, 80),
-                    (xama.raio_aura, xama.raio_aura),
-                    xama.raio_aura
-                )
-                tela.blit(
-                    aura,
-                    (xama.rect.centerx - xama.raio_aura - scroll_x,xama.rect.centery - xama.raio_aura)
-                )
-
-                aura_tela = xama.aura_rect().move(-scroll_x, 0)
-                if aura_tela.colliderect(eindein.rect):
-                    xama.causar_dano(eindein)
-
+        # desenha vida
         for i in range(3):
             if i < eindein.vida:
                 tela.blit(coração_vermelho, (10 + i * 70, 10))
             else:
                 tela.blit(coração_preto, (10 + i * 70, 10))
+
+        desenhar_hud(tela, largura, altura)
 
         if eindein.vida == 0:
             pygame.mixer.music.stop()

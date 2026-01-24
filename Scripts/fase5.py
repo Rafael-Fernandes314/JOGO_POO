@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Dr_G, BuracoNegro
+from dr_g import Dr_G, BuracoNegro
 from artefato import Escudo
 from hud import desenhar_hud
 from inventario import artefatos_coletados
@@ -95,23 +95,24 @@ def jogar_fase_5():
         teclas = pygame.key.get_pressed()
 
         # movimentação e rolagem da câmera
-        if teclas[K_a]:
-            if eindein.rect.left > 0 or scroll_x <= 0:
-                eindein.mover("esquerda")
-
-        elif teclas[K_d]:
-            eindein.mover("direita")
-            if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
-                scroll_x += 5
-                eindein.rect.left = 200
+        if teclas[K_s]:
+            eindein.agachar(True)
+        else:
+            eindein.agachar(False)
+            if teclas[K_a]:
+                if eindein.rect.left > 0 or scroll_x <= 0:
+                    eindein.mover("esquerda")
+            elif teclas[K_d]:
+                eindein.mover("direita")
+                if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
+                    scroll_x += 5
+                    eindein.rect.left = 200
 
         # desenha o cenário
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
             
-        # desenha o player e o inimigo com base no fundo
-        tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
         sprites.update() # atualiza o grupo de sprites
         # desenha todos os sprites
         sprites.draw(tela)

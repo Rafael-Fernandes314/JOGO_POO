@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Elfo
+from enemy import Elfo, Flecha
 from artefato import Anel
 from hud import desenhar_hud
 from inventario import artefatos_coletados
@@ -18,6 +18,7 @@ def fade(tela, largura, altura):
         pygame.time.delay(3)
 
 def jogar_fase_6():
+
     pygame.init()
 
     # tamanho da tela
@@ -53,16 +54,17 @@ def jogar_fase_6():
 
     # sprites
     sprites = pygame.sprite.Group()
-    eindein = Eindein()            # cria um jogador
+    grupo_projeteis = pygame.sprite.Group()
+    eindein = Eindein() # cria um jogador
     # lista de goblins
     elfos = [
-        Elfo(2500, 530),
-        Elfo(5000, 530),
-        Elfo(7500, 530),
-        Elfo(10000, 530),
-        Elfo(12500, 530),
-        Elfo(15000, 530),
-        Elfo(17500, 530),
+        Elfo(2500, 530, grupo_projeteis, eindein),
+        Elfo(5000, 530, grupo_projeteis, eindein),
+        Elfo(7500, 530, grupo_projeteis, eindein),
+        Elfo(10000, 530, grupo_projeteis, eindein),
+        Elfo(12500, 530, grupo_projeteis, eindein),
+        Elfo(15000, 530, grupo_projeteis, eindein),
+        Elfo(17500, 530, grupo_projeteis, eindein),
     ]
     sprites.add(eindein)
     artefato = Anel(2800, 500)
@@ -98,23 +100,24 @@ def jogar_fase_6():
         teclas = pygame.key.get_pressed()
 
         # movimentação e rolagem da câmera
-        if teclas[K_a]:
-            if eindein.rect.left > 0 or scroll_x <= 0:
-                eindein.mover("esquerda")
-
-        elif teclas[K_d]:
-            eindein.mover("direita")
-            if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
-                scroll_x += 5
-                eindein.rect.left = 200
+        if teclas[K_s]:
+            eindein.agachar(True)
+        else:
+            eindein.agachar(False)
+            if teclas[K_a]:
+                if eindein.rect.left > 0 or scroll_x <= 0:
+                    eindein.mover("esquerda")
+            elif teclas[K_d]:
+                eindein.mover("direita")
+                if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
+                    scroll_x += 5
+                    eindein.rect.left = 200
 
         # desenha o cenário
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
             
-        # desenha o player e o inimigo com base no fundo
-        tela.blit(eindein.image, (eindein.rect.x, eindein.rect.y))
         sprites.update() # atualiza o grupo de sprites
         # desenha todos os sprites
         sprites.draw(tela)
@@ -142,6 +145,18 @@ def jogar_fase_6():
 
             if elfo.morreu():
                 elfo.remove(elfo)
+
+        grupo_projeteis.update()
+        for flecha in grupo_projeteis:
+            flecha.update()
+            tela.blit(flecha.image, (flecha.rect.x - scroll_x, flecha.rect.y))
+
+            flecha_hitbox_tela = flecha.hitbox.move(-scroll_x, 0)
+            if eindein.rect.colliderect(flecha_hitbox_tela) and not flecha.dano_aplicado:
+                eindein.levar_dano(flecha.dano)
+                flecha.dano_aplicado = True
+                flecha.kill()
+
 
         for i in range(3):
             if i < eindein.vida:
