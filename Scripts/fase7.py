@@ -2,8 +2,8 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import GoblinV
-from artefato import Orbe
+from enemy import Xamã
+from artefato import Emblema
 from hud import desenhar_hud
 from inventario import artefatos_coletados
 import estado_jogo
@@ -17,7 +17,7 @@ def fade(tela, largura, altura):
         pygame.display.update()
         pygame.time.delay(3)
 
-def jogar_fase_3():
+def jogar_fase_7():
     pygame.init()
 
     # tamanho da tela
@@ -48,24 +48,24 @@ def jogar_fase_3():
     coração_preto = pygame.transform.scale(coração_preto, (120, 120))
 
     # carrega o fundo
-    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase3.png").convert()
+    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase7.jpg").convert()
     fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     # sprites
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    goblins = [
-        GoblinV(2500, 530),
-        GoblinV(5000, 530),
-        GoblinV(7500, 530),
-        GoblinV(10000, 530),
-        GoblinV(12500, 530),
-        GoblinV(15000, 530),
-        GoblinV(17500, 530),
+    xamãs = [
+        Xamã(2500, 530),
+        Xamã(5000, 530),
+        Xamã(7500, 530),
+        Xamã(10000, 530),
+        Xamã(12500, 530),
+        Xamã(15000, 530),
+        Xamã(17500, 530),
     ]
     sprites.add(eindein)
-    artefato = Orbe(2800, 500)
+    artefato = Emblema(2800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
     cenario_largura = 3000 # tamanho do cenário
@@ -75,7 +75,7 @@ def jogar_fase_3():
 
     fadein = True
     fade_alpha = 255
-    estado_jogo.fase_atual = 3
+    estado_jogo.fase_atual = 7
 
     # loop do jogo
     while True:
@@ -127,21 +127,30 @@ def jogar_fase_3():
             artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
             if eindein.rect.colliderect(artefato_hitbox_tela):
                 coletar.play()
-                artefatos_coletados["orbe"] = True
+                artefatos_coletados["emblema"] = True
                 artefato = None
 
-        # desenha e atualiza todos os goblins
-        for goblin in goblins[:]:
-            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-            goblin.update()
+        # desenha e atualiza todos os xamãs
+        for xama in xamãs:
+            tela.blit(xama.image, (xama.rect.x - scroll_x, xama.rect.y))
+            xama.update()
 
-            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+            if xama.aura_ativa:
+                aura = pygame.Surface((xama.raio_aura * 2, xama.raio_aura * 2), pygame.SRCALPHA)
+                pygame.draw.circle(
+                    aura,
+                    (180, 0, 255, 80),
+                    (xama.raio_aura, xama.raio_aura),
+                    xama.raio_aura
+                )
+                tela.blit(
+                    aura,
+                    (xama.rect.centerx - xama.raio_aura - scroll_x,xama.rect.centery - xama.raio_aura)
+                )
 
-            if eindein.rect.colliderect(goblin_hitbox_tela):
-                goblin.encostar_no_player(eindein)
-
-            if goblin.morreu():
-                goblins.remove(goblin)
+                aura_tela = xama.aura_rect().move(-scroll_x, 0)
+                if aura_tela.colliderect(eindein.rect):
+                    xama.causar_dano(eindein)
 
         for i in range(3):
             if i < eindein.vida:
@@ -170,6 +179,6 @@ def jogar_fase_3():
         if eindein.rect.x + scroll_x >= 3000:
             pygame.mixer.music.stop()
             fade(tela,largura,altura)
-            from fase4 import jogar_fase_4
-            jogar_fase_4()
+            from fase8 import jogar_fase_8
+            jogar_fase_8()
             return

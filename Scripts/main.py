@@ -5,6 +5,7 @@ from fase3 import jogar_fase_3
 from fase4 import jogar_fase_4
 from fase5 import jogar_fase_5
 from fase6 import jogar_fase_6
+from fase7 import jogar_fase_7
 from gameover import Game_over
 import estado_jogo
 
@@ -24,6 +25,8 @@ def main():
             jogar_fase_5()
         elif estado_jogo.fase_atual == 6:
             jogar_fase_6()
+        elif estado_jogo.fase_atual == 7:
+            jogar_fase_7()
 
 if __name__ == "__main__":
     main()

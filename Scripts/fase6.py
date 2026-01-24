@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import GoblinV
+from enemy import Elfo
 from artefato import Anel
 from hud import desenhar_hud
 from inventario import artefatos_coletados
@@ -55,14 +55,14 @@ def jogar_fase_6():
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    goblins = [
-        GoblinV(2500, 530),
-        GoblinV(5000, 530),
-        GoblinV(7500, 530),
-        GoblinV(10000, 530),
-        GoblinV(12500, 530),
-        GoblinV(15000, 530),
-        GoblinV(17500, 530),
+    elfos = [
+        Elfo(2500, 530),
+        Elfo(5000, 530),
+        Elfo(7500, 530),
+        Elfo(10000, 530),
+        Elfo(12500, 530),
+        Elfo(15000, 530),
+        Elfo(17500, 530),
     ]
     sprites.add(eindein)
     artefato = Anel(2800, 500)
@@ -130,15 +130,18 @@ def jogar_fase_6():
                 artefatos_coletados["anel"] = True
                 artefato = None
 
-        # desenha e atualiza todos os goblins
-        for goblin in goblins[:]:
-            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-            goblin.update()
+        # desenha e atualiza todos os elfos
+        for elfo in elfos[:]:
+            tela.blit(elfo.image, (elfo.rect.x - scroll_x, elfo.rect.y))
+            elfo.update()
 
-            # contato entre o player e o goblin
-            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-            if eindein.rect.colliderect(goblin_hitbox_tela):
-                eindein.levar_dano()
+            elfo_hitbox_tela = elfo.hitbox.move(-scroll_x, 0)
+
+            if eindein.rect.colliderect(elfo_hitbox_tela):
+                elfo.encostar_no_player(eindein)
+
+            if elfo.morreu():
+                elfo.remove(elfo)
 
         for i in range(3):
             if i < eindein.vida:

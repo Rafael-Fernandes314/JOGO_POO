@@ -130,14 +130,18 @@ def jogar_fase_4():
                 artefatos_coletados["espada"] = True
                 artefato = None
 
-        # desenha e atualiza todos os goblins
+        # desenha e atualiza todos os golens
         for golem in golens[:]:
             tela.blit(golem.image, (golem.rect.x - scroll_x, golem.rect.y))
             golem.update()
 
             golem_hitbox_tela = golem.hitbox.move(-scroll_x, 0)
+
             if eindein.rect.colliderect(golem_hitbox_tela):
-                eindein.levar_dano(2)
+                golem.encostar_no_player(eindein)
+
+            if golem.morreu():
+                golem.remove(golem)
 
         for i in range(3):
             if i < eindein.vida:

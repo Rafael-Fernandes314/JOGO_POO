@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import GoblinV
+from enemy import Dr_G, BuracoNegro
 from artefato import Escudo
 from hud import desenhar_hud
 from inventario import artefatos_coletados
@@ -12,12 +12,13 @@ def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
     fade.fill((0, 0, 0))
     for i in range(0, 255):
-        fade.set_alpha(i)
+        fade.set_alpha()
         tela.blit(fade, (0, 0))
         pygame.display.update()
         pygame.time.delay(3)
 
 def jogar_fase_5():
+
     pygame.init()
 
     # tamanho da tela
@@ -53,22 +54,18 @@ def jogar_fase_5():
 
     # sprites
     sprites = pygame.sprite.Group()
+    grupo_inimigos = pygame.sprite.Group()
+    grupo_projeteis = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    goblins = [
-        GoblinV(2500, 530),
-        GoblinV(5000, 530),
-        GoblinV(7500, 530),
-        GoblinV(10000, 530),
-        GoblinV(12500, 530),
-        GoblinV(15000, 530),
-        GoblinV(17500, 530),
+    dr_g = [
+        Dr_G(2500, 530, grupo_inimigos, grupo_projeteis),
     ]
     sprites.add(eindein)
     artefato = Escudo(2800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3000 # tamanho do cenário
+    cenario_largura = 3200 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
@@ -130,15 +127,42 @@ def jogar_fase_5():
                 artefatos_coletados["escudo"] = True
                 artefato = None
 
-        # desenha e atualiza todos os goblins
-        for goblin in goblins[:]:
-            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-            goblin.update()
+        # desenha e atualiza o Dr. G
+        for dr in dr_g[:]:
+            tela.blit(dr.image, (dr.rect.x - scroll_x, dr.rect.y))
+            dr.update()
+            dr.desenhar_nome(tela, scroll_x)
+            dr.desenhar_barra_hp(tela, scroll_x)
 
-            # contato entre o player e o goblin
-            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-            if eindein.rect.colliderect(goblin_hitbox_tela):
-                eindein.levar_dano()
+            dr_hitbox_tela = dr.hitbox.move(-scroll_x, 0)
+
+            if eindein.rect.colliderect(dr_hitbox_tela):
+                dr.encostar_no_player(eindein)
+
+            if dr.morreu():
+                dr.kill(dr)
+
+        for p in grupo_projeteis:
+            if isinstance(p, BuracoNegro):
+                p.update(eindein)
+            else:
+                p.update()
+            tela.blit(p.image, (p.rect.x - scroll_x, p.rect.y))
+
+            hitbox_proj_tela = p.hitbox.move(-scroll_x, 0)
+            if hitbox_proj_tela.colliderect(eindein.rect):
+                eindein.levar_dano(1)
+                p.kill()
+
+        for inimigo in grupo_inimigos:
+            tela.blit(inimigo.image, (inimigo.rect.x - scroll_x, inimigo.rect.y))
+            inimigo.update()
+
+            hitbox_inimigo_tela = inimigo.hitbox.move(-scroll_x, 0)
+
+            if hitbox_inimigo_tela.colliderect(eindein.rect):
+                inimigo.encostar_no_player(eindein)
+
 
         for i in range(3):
             if i < eindein.vida:
@@ -151,7 +175,7 @@ def jogar_fase_5():
             from gameover import Game_over
             Game_over()
             return
-        
+            
         if fadein:
             fadein = pygame.Surface((largura,altura))
             fadein.fill((0,0,0))

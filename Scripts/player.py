@@ -11,12 +11,12 @@ class Eindein(pygame.sprite.Sprite):  # o player
 
         # carrega a imagem dele e muda o tamanho
         self.image = pygame.image.load("Assets/Sprites/Player/Eidein-parado-e.png")
-        self.image = pygame.transform.scale(self.image, (32 * 4, 32 * 4))
+        self.image = pygame.transform.scale(self.image, (128, 128))
 
         # física do personagem
         self.vel_y = 0  # velocidade na vertical
         self.pulando = False # para quando pular
-        self.gravidade = 2  # gravidade pra quando cair
+        self.gravidade = 1.9  # gravidade pra quando cair
         self.velocidade = 3 # velocidade na horizontal
         self.animar = False # pra quando for animar
         self.vida = 3   # vida

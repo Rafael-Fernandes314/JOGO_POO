@@ -128,14 +128,18 @@ def jogar_fase_1():
                 artefato = None
 
         # desenha e atualiza todos os goblins
-        for goblin in goblins:
+        for goblin in goblins[:]:
             tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
             goblin.update()
 
-            # contato entre o player e o goblin
             goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+
             if eindein.rect.colliderect(goblin_hitbox_tela):
-                eindein.levar_dano()
+                goblin.encostar_no_player(eindein)
+
+            if goblin.morreu():
+                goblins.remove(goblin)
+
 
         for i in range(3):
             if i < eindein.vida:

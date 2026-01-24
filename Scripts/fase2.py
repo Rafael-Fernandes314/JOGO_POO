@@ -120,10 +120,13 @@ def jogar_fase_2():
             tela.blit(ladrão.image, (ladrão.rect.x - scroll_x, ladrão.rect.y))
             ladrão.update()
 
-            # contato entre o player e o ladrão
             ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
+
             if eindein.rect.colliderect(ladrão_hitbox_tela):
-                eindein.levar_dano()
+                ladrão.encostar_no_player(eindein)
+
+            if ladrão.morreu():
+                ladrão.remove(ladrão)
 
         for i in range(3):
             if i < eindein.vida:
