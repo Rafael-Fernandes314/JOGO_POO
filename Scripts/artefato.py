@@ -67,5 +67,5 @@ class Emblema(Artefato):
 class Sangue(Artefato):
     def __init__(self, largura, altura):
         self.image = pygame.image.load("Assets\Sprites\Arterfatos\sangue.png")
-        self.image = pygame.transform.scale(self.image, (32, 32))
+        self.image = pygame.transform.scale(self.image, (100, 100))
         super().__init__(largura, altura)

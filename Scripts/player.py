@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from typing import List
+import estado_jogo
 from sys import exit
 
 pygame.init()
@@ -21,7 +22,8 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.gravidade = 0.8  # gravidade pra quando cair
         self.velocidade = 3 # velocidade na horizontal
         self.animar = False # pra quando for animar
-        self.vida = 3   # vida
+        self.vida_max = estado_jogo.vida_max_jogador
+        self.vida = self.vida_max
         self.atacando = False # quando for atacar
         self.invencivel = False
         self.invencivel_timer = 0
@@ -69,7 +71,7 @@ class Eindein(pygame.sprite.Sprite):  # o player
         self.rect.y += self.vel_y
 
         # define o chão
-        chao = 530 if self.agachado else 510
+        chao = 530 if self.agachado else 512
         if self.rect.bottom >= chao:
             self.rect.bottom = chao
             self.pulando = False

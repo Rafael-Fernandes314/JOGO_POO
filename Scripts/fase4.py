@@ -32,6 +32,20 @@ def jogar_fase_4():
     tela = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption("Herdeiros do Fim")
 
+    logo_pause = pygame.image.load("Assets/Sprites/UI/jogo_pausado.png").convert_alpha()
+    logo_pause = pygame.transform.scale(logo_pause, (500, 250))
+    rect_logo_pause = logo_pause.get_rect(center=(largura // 2, altura // 2 - 100))
+
+    fonte_pause = pygame.font.Font("Assets/Fontes/PixelifySans-VariableFont_wght.ttf", 36)
+    texto_pause = fonte_pause.render("Pressione ESC para continuar", True, (255, 255, 255))
+    rect_texto_pause = texto_pause.get_rect(center=(largura // 2, altura // 2 + 120))
+
+    pausado = False
+
+    overlay = pygame.Surface((largura, altura))
+    overlay.fill((0, 0, 0))
+    overlay.set_alpha(160)
+
     pygame.mixer.init()
     pygame.mixer.music.load("Assets/Sons/Música/fase3.mp3")
     pygame.mixer.music.set_volume(0.5)
@@ -78,86 +92,89 @@ def jogar_fase_4():
     fadein = True
     fade_alpha = 255
     estado_jogo.fase_atual = 4
+    estado_jogo.vida_max_jogador = 5
 
     # loop do jogo
     while True:
-        relógio.tick(60) # 60 fps
+        relógio.tick(60)
         tela.fill(PRETO)
 
-        # eventos do jogo
         for event in pygame.event.get():
-            # sair do jogo
             if event.type == QUIT:
                 pygame.quit()
                 exit()
-            # eventos de tecla
+
             if event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    eindein.pular()
-                    pulo.play()
+                if event.key == K_ESCAPE:
+                    pausado = not pausado
 
-        # teclas que tão sendo seguradas
-        teclas = pygame.key.get_pressed()
+                if not pausado:
+                    if event.key == K_SPACE:
+                        eindein.pular()
+                        pulo.play()
 
-        # movimentação e rolagem da câmera
-        if teclas[K_s]:
-            eindein.agachar(True)
-        else:
-            eindein.agachar(False)
-            if teclas[K_a]:
-                if eindein.rect.left > 0 or scroll_x <= 0:
-                    eindein.mover("esquerda")
-            elif teclas[K_d]:
-                eindein.mover("direita")
-                if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
-                    scroll_x += 5
-                    eindein.rect.left = 200
-
-        # desenha o cenário
+        # ===== CENÁRIO (sempre desenha) =====
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
-            
-        sprites.update() # atualiza o grupo de sprites
-        # desenha todos os sprites
-        sprites.draw(tela)
 
-        if artefato:
-            tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
-            artefato.update()
+        # ===== JOGO RODANDO =====
+        if not pausado:
+            teclas = pygame.key.get_pressed()
 
-            # colisão com o player
-            artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
-            if eindein.rect.colliderect(artefato_hitbox_tela):
-                coletar.play()
-                artefatos_coletados["espada"] = True
-                artefato = None
+            if teclas[K_s]:
+                eindein.agachar(True)
+            else:
+                eindein.agachar(False)
+                if teclas[K_a]:
+                    if eindein.rect.left > 0 or scroll_x <= 0:
+                        eindein.mover("esquerda")
+                elif teclas[K_d]:
+                    eindein.mover("direita")
+                    if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
+                        scroll_x += 5
+                        eindein.rect.left = 200
 
-        # desenha e atualiza todos os golens
-        for golem in golens[:]:
-            tela.blit(golem.image, (golem.rect.x - scroll_x, golem.rect.y))
-            golem.update()
+            sprites.update()
+            grupo_projeteis.update()
 
-            golem_hitbox_tela = golem.hitbox.move(-scroll_x, 0)
+            sprites.draw(tela)
 
-            if eindein.rect.colliderect(golem_hitbox_tela):
-                golem.encostar_no_player(eindein)
+            if artefato:
+                tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
+                artefato.update()
 
-            if golem.morreu():
-                golem.remove(golem)
+                artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
+                if eindein.rect.colliderect(artefato_hitbox_tela):
+                    coletar.play()
+                    artefatos_coletados["espada"] = True
+                    artefato = None
 
-        grupo_projeteis.update()
-        for proj in grupo_projeteis:
-            tela.blit(proj.image, (proj.rect.x - scroll_x, proj.rect.y))
-            hitbox_tela = proj.hitbox.move(-scroll_x, 0)
-            if isinstance(proj, ExplosaoGolem):
-                if not hasattr(proj, "dano_aplicado"):
-                    proj.dano_aplicado = False
-                if hitbox_tela.colliderect(eindein.rect) and not proj.dano_aplicado:
-                    eindein.levar_dano(proj.dano)
-                    proj.dano_aplicado = True
+            for golem in golens[:]:
+                tela.blit(golem.image, (golem.rect.x - scroll_x, golem.rect.y))
+                golem.update()
 
-        for i in range(3):
+                golem_hitbox_tela = golem.hitbox.move(-scroll_x, 0)
+                if eindein.rect.colliderect(golem_hitbox_tela):
+                    golem.encostar_no_player(eindein)
+
+                if golem.morreu():
+                    golens.remove(golem)
+
+            for proj in grupo_projeteis:
+                tela.blit(proj.image, (proj.rect.x - scroll_x, proj.rect.y))
+                hitbox_tela = proj.hitbox.move(-scroll_x, 0)
+
+                if isinstance(proj, ExplosaoGolem):
+                    if not hasattr(proj, "dano_aplicado"):
+                        proj.dano_aplicado = False
+
+                    if hitbox_tela.colliderect(eindein.rect) and not proj.dano_aplicado:
+                        eindein.levar_dano(proj.dano)
+                        proj.dano_aplicado = True
+
+        # ===== VIDA (sempre aparece) =====
+        for i in range(eindein.vida_max):
             if i < eindein.vida:
                 tela.blit(coração_vermelho, (10 + i * 70, 10))
             else:
@@ -168,22 +185,31 @@ def jogar_fase_4():
             from gameover import Game_over
             Game_over()
             return
-        
+
         if fadein:
-            fadein = pygame.Surface((largura,altura))
-            fadein.fill((0,0,0))
-            fadein.set_alpha(fade_alpha)
-            tela.blit(fadein,(0,0))
+            fade_surface = pygame.Surface((largura, altura))
+            fade_surface.fill((0, 0, 0))
+            fade_surface.set_alpha(fade_alpha)
+            tela.blit(fade_surface, (0, 0))
             fade_alpha -= 5
             if fade_alpha <= 0:
                 fadein = False
-        
+
         desenhar_hud(tela, largura, altura)
-        pygame.display.flip()  # atualiza a tela
+
+        # ===== PAUSE =====
+        if pausado:
+            tela.blit(overlay, (0, 0))
+            tela.blit(logo_pause, rect_logo_pause)
+
+            if (pygame.time.get_ticks() // 500) % 2 == 0:
+                tela.blit(texto_pause, rect_texto_pause)
+
+        pygame.display.flip()
 
         if eindein.rect.x + scroll_x >= 3000:
             pygame.mixer.music.stop()
-            fade(tela,largura,altura)
+            fade(tela, largura, altura)
             from fase5 import jogar_fase_5
             jogar_fase_5()
             return

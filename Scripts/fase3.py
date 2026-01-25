@@ -31,6 +31,20 @@ def jogar_fase_3():
     tela = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption("Herdeiros do Fim")
 
+    logo_pause = pygame.image.load("Assets/Sprites/UI/jogo_pausado.png").convert_alpha()
+    logo_pause = pygame.transform.scale(logo_pause, (500, 250))
+    rect_logo_pause = logo_pause.get_rect(center=(largura // 2, altura // 2 - 100))
+
+    fonte_pause = pygame.font.Font("Assets/Fontes/PixelifySans-VariableFont_wght.ttf", 36)
+    texto_pause = fonte_pause.render("Pressione ESC para continuar", True, (255, 255, 255))
+    rect_texto_pause = texto_pause.get_rect(center=(largura // 2, altura // 2 + 120))
+
+    pausado = False
+
+    overlay = pygame.Surface((largura, altura))
+    overlay.fill((0, 0, 0))
+    overlay.set_alpha(160)
+
     pygame.mixer.init()
     pygame.mixer.music.load("Assets/Sons/Música/fase3.mp3")
     pygame.mixer.music.set_volume(0.5)
@@ -76,101 +90,112 @@ def jogar_fase_3():
     fadein = True
     fade_alpha = 255
     estado_jogo.fase_atual = 3
+    estado_jogo.vida_max_jogador = 4
 
     # loop do jogo
     while True:
-        relógio.tick(60) # 60 fps
-        tela.fill(PRETO)
+        relógio.tick(60)
 
-        # eventos do jogo
         for event in pygame.event.get():
-            # sair do jogo
             if event.type == QUIT:
                 pygame.quit()
                 exit()
-            # eventos de tecla
             if event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    eindein.pular()
-                    pulo.play()
+                if event.key == K_ESCAPE:
+                    pausado = not pausado
+                if not pausado:
+                    if event.key == K_SPACE:
+                        eindein.pular()
+                        pulo.play()
 
-        # teclas que tão sendo seguradas
         teclas = pygame.key.get_pressed()
 
-        # movimentação e rolagem da câmera
-        if teclas[K_s]:
-            eindein.agachar(True)
-        else:
-            eindein.agachar(False)
-            if teclas[K_a]:
-                if eindein.rect.left > 0 or scroll_x <= 0:
-                    eindein.mover("esquerda")
-            elif teclas[K_d]:
-                eindein.mover("direita")
-                if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
-                    scroll_x += 5
-                    eindein.rect.left = 200
+        if not pausado:
+            if teclas[K_s]:
+                eindein.agachar(True)
+            else:
+                eindein.agachar(False)
 
-        # desenha o cenário
+                if teclas[K_a]:
+                    if eindein.rect.left > 0 or scroll_x <= 0:
+                        eindein.mover("esquerda")
+                elif teclas[K_d]:
+                    eindein.mover("direita")
+                    if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
+                        scroll_x += 5
+                        eindein.rect.left = 200
+
+        if not pausado:
+            sprites.update()
+
+            if artefato:
+                artefato.update()
+                artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
+                if eindein.rect.colliderect(artefato_hitbox_tela):
+                    coletar.play()
+                    artefatos_coletados["orbe"] = True
+                    artefato = None
+
+            for goblin in goblins[:]:
+                goblin.update()
+                goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+
+                if eindein.rect.colliderect(goblin_hitbox_tela):
+                    goblin.encostar_no_player(eindein)
+                if goblin.morreu():
+                    goblins.remove(goblin)
+
+        tela.fill(PRETO)
+
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
-            
-        sprites.update() # atualiza o grupo de sprites
-        # desenha todos os sprites
+
+        # sprites
         sprites.draw(tela)
 
+        # artefato
         if artefato:
             tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
-            artefato.update()
 
-            # colisão com o player
-            artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
-            if eindein.rect.colliderect(artefato_hitbox_tela):
-                coletar.play()
-                artefatos_coletados["orbe"] = True
-                artefato = None
-
-        # desenha e atualiza todos os goblins
-        for goblin in goblins[:]:
+        # goblins
+        for goblin in goblins:
             tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
-            goblin.update()
 
-            goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-
-            if eindein.rect.colliderect(goblin_hitbox_tela):
-                goblin.encostar_no_player(eindein)
-
-            if goblin.morreu():
-                goblins.remove(goblin)
-
-        for i in range(3):
+        for i in range(eindein.vida_max):
             if i < eindein.vida:
                 tela.blit(coração_vermelho, (10 + i * 70, 10))
             else:
                 tela.blit(coração_preto, (10 + i * 70, 10))
 
-        if eindein.vida == 0:
+        if not pausado and eindein.vida == 0:
             pygame.mixer.music.stop()
             from gameover import Game_over
             Game_over()
             return
-        
+
         if fadein:
-            fadein = pygame.Surface((largura,altura))
-            fadein.fill((0,0,0))
-            fadein.set_alpha(fade_alpha)
-            tela.blit(fadein,(0,0))
+            fadein_surface = pygame.Surface((largura, altura))
+            fadein_surface.fill((0, 0, 0))
+            fadein_surface.set_alpha(fade_alpha)
+            tela.blit(fadein_surface, (0, 0))
             fade_alpha -= 5
             if fade_alpha <= 0:
                 fadein = False
-        
-        desenhar_hud(tela, largura, altura)
-        pygame.display.flip()  # atualiza a tela
 
-        if eindein.rect.x + scroll_x >= 3000:
+        if pausado:
+            overlay = pygame.Surface((largura, altura), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            tela.blit(overlay, (0, 0))
+            tela.blit(logo_pause, rect_logo_pause)
+            tela.blit(texto_pause, rect_texto_pause)
+
+        desenhar_hud(tela, largura, altura)
+        pygame.display.flip()
+
+        if not pausado and eindein.rect.x + scroll_x >= 3000:
             pygame.mixer.music.stop()
-            fade(tela,largura,altura)
+            fade(tela, largura, altura)
             from fase4 import jogar_fase_4
             jogar_fase_4()
             return

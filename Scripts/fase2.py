@@ -29,6 +29,16 @@ def jogar_fase_2():
     tela = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption("Herdeiros do Fim")
 
+    pausado = False
+
+    logo_pause = pygame.image.load("Assets/Sprites/UI/jogo_pausado.png").convert_alpha()
+    logo_pause = pygame.transform.scale(logo_pause, (500, 250))
+    rect_logo_pause = logo_pause.get_rect(center=(largura // 2, altura // 2 - 100))
+
+    fonte_pause = pygame.font.Font("Assets/Fontes/PixelifySans-VariableFont_wght.ttf", 36)
+    texto_pause = fonte_pause.render("Pressione ESC para continuar", True, (255, 255, 255))
+    rect_texto_pause = texto_pause.get_rect(center=(largura // 2, altura // 2 + 120))
+
     pygame.mixer.init()
     pygame.mixer.music.load("Assets/Sons/Música/fase2.mp3")
     pygame.mixer.music.set_volume(0.5)
@@ -66,70 +76,70 @@ def jogar_fase_2():
     scroll_x = 0  # controla a mudança da câmera
     cenario_largura = 3000 # tamanho do cenário
 
-    tela.blit(fundo_img, (0, 0))
-    pygame.display.flip()
-
     fadein = True
     fade_alpha = 255
     estado_jogo.fase_atual = 2
+    estado_jogo.vida_max_jogador = 4
 
     # loop do jogo
     while True:
         relógio.tick(60) # 60 fps
         tela.fill(PRETO)
 
-        # eventos do jogo
-        for event in pygame.event.get():
-            # sair do jogo
-            if event.type == QUIT:
-                pygame.quit()
-                exit()
-            # eventos de tecla
-            if event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    eindein.pular()
-                    pulo.play()
-
-        # teclas que tão sendo seguradas
-        teclas = pygame.key.get_pressed()
-
-        # movimentação e rolagem da câmera
-        if teclas[K_s]:
-            eindein.agachar(True)
-        else:
-            eindein.agachar(False)
-            if teclas[K_a]:
-                if eindein.rect.left > 0 or scroll_x <= 0:
-                    eindein.mover("esquerda")
-            elif teclas[K_d]:
-                eindein.mover("direita")
-                if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
-                    scroll_x += 5
-                    eindein.rect.left = 200
-
-        # desenha o cenário
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
-            
-        sprites.update() # atualiza o grupo de sprites
-        # desenha todos os sprites
+
+
+        # eventos do jogo
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                exit()
+
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pausado = not pausado
+
+                if not pausado:
+                    if event.key == K_SPACE:
+                        eindein.pular()
+                        pulo.play()
+
+        # teclas que tão sendo seguradas
+        if not pausado:
+            teclas = pygame.key.get_pressed()
+
+            if teclas[K_s]:
+                eindein.agachar(True)
+            else:
+                eindein.agachar(False)
+                if teclas[K_a]:
+                    if eindein.rect.left > 0 or scroll_x <= 0:
+                        eindein.mover("esquerda")
+                elif teclas[K_d]:
+                    eindein.mover("direita")
+                    if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
+                        scroll_x += 5
+                        eindein.rect.left = 200
+
+            sprites.update()
+
+            for ladrão in ladrões[:]:
+                ladrão.update()
+                ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
+
+                if eindein.rect.colliderect(ladrão_hitbox_tela):
+                    ladrão.encostar_no_player(eindein)
+
+                if ladrão.morreu():
+                    ladrões.remove(ladrão)
+
         sprites.draw(tela)
-
-        # desenha e atualiza todos os ladrões
-        for ladrão in ladrões[:]:
+        for ladrão in ladrões:
             tela.blit(ladrão.image, (ladrão.rect.x - scroll_x, ladrão.rect.y))
-            ladrão.update()
 
-            ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
-
-            if eindein.rect.colliderect(ladrão_hitbox_tela):
-                ladrão.encostar_no_player(eindein)
-
-            if ladrão.morreu():
-                ladrão.remove(ladrões)
-
-        for i in range(3):
+        for i in range(eindein.vida_max):
             if i < eindein.vida:
                 tela.blit(coração_vermelho, (10 + i * 70, 10))
             else:
@@ -151,6 +161,14 @@ def jogar_fase_2():
                 fadein = False
         
         desenhar_hud(tela, largura, altura)
+
+        if pausado:
+            overlay = pygame.Surface((largura, altura), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            tela.blit(overlay, (0, 0))
+            tela.blit(logo_pause, rect_logo_pause)
+            tela.blit(texto_pause, rect_texto_pause)
+
         pygame.display.flip()  # atualiza a tela
 
         if eindein.rect.x + scroll_x >= 3000:
