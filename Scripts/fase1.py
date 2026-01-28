@@ -108,6 +108,15 @@ def jogar_fase_1():
         teclas = pygame.key.get_pressed()
 
         if not pausado:
+
+            if eindein.atacando and not eindein.ja_acertou:
+                if 0.9 <= eindein.atual_ataque <= 1.1:
+                    for goblin in goblins:
+                        goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+                        if eindein.hitbox_ataque.colliderect(goblin_hitbox_tela):
+                            goblin.levar_dano(1)
+                            eindein.ja_acertou = True
+                            
             if teclas[K_s]:
                 eindein.agachar(True)
             else:
@@ -121,6 +130,10 @@ def jogar_fase_1():
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
                         eindein.rect.left = 200
+
+                        
+                    if teclas[K_j]:  
+                        eindein.atacar()
 
         if not pausado:
             sprites.update()
