@@ -158,10 +158,28 @@ def jogar_fase_4():
                 tela.blit(golem.image, (golem.rect.x - scroll_x, golem.rect.y))
                 golem.update()
 
+                # cria a flag de dano se não existir
+                if not hasattr(golem, "atingido_no_ataque"):
+                    golem.atingido_no_ataque = False
+
+                # ===== ATAQUE DO PLAYER =====
+                if eindein.atacando and not golem.atingido_no_ataque:
+                    hitbox_ataque_tela = eindein.hitbox_ataque.move(-scroll_x, 0)
+
+                    if hitbox_ataque_tela.colliderect(golem.hitbox):
+                        golem.levar_dano(eindein.dano)
+                        golem.atingido_no_ataque = True
+
+                # reseta quando o ataque acaba
+                if not eindein.atacando:
+                    golem.atingido_no_ataque = False
+
+                # ===== COLISÃO COM PLAYER =====
                 golem_hitbox_tela = golem.hitbox.move(-scroll_x, 0)
                 if eindein.rect.colliderect(golem_hitbox_tela):
                     golem.encostar_no_player(eindein)
 
+                # ===== MORTE =====
                 if golem.morreu():
                     golens.remove(golem)
 

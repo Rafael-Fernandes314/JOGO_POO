@@ -129,6 +129,15 @@ def jogar_fase_2():
 
             sprites.update()
 
+            if eindein.atacando and not eindein.ja_acertou:
+                if 0.9 <= eindein.atual_ataque <= 1.1:
+                    for ladrão in ladrões:
+                        ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
+                        if eindein.hitbox_ataque.colliderect(ladrão_hitbox_tela):
+                            ladrão.levar_dano(1)
+                            eindein.ja_acertou = True
+
+
             for ladrão in ladrões[:]:
                 ladrão.update()
                 ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)

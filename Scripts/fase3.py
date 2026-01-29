@@ -131,6 +131,14 @@ def jogar_fase_3():
         if not pausado:
             sprites.update()
 
+            if eindein.atacando and not eindein.ja_acertou:
+                if 0.9 <= eindein.atual_ataque <= 1.1:
+                    for goblin in goblins:
+                        goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+                        if eindein.hitbox_ataque.colliderect(goblin_hitbox_tela):
+                            goblin.levar_dano(1)
+                            eindein.ja_acertou = True
+
             if artefato:
                 artefato.update()
                 artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)

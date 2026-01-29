@@ -142,10 +142,17 @@ def jogar_fase_5():
 
             for dr in dr_g[:]:
                 dr.update()
-                if eindein.rect.colliderect(dr.hitbox.move(-scroll_x, 0)):
-                    dr.encostar_no_player(eindein)
-                if dr.morreu():
-                    dr.kill()
+
+            if eindein.atacando:
+                hitbox_ataque_tela = eindein.hitbox_ataque.move(-scroll_x, 0)
+                if hitbox_ataque_tela.colliderect(dr.hitbox):
+                    dr.levar_dano(eindein.dano)
+
+            if eindein.rect.colliderect(dr.hitbox.move(-scroll_x, 0)):
+                dr.encostar_no_player(eindein)
+
+            if dr.morreu():
+                dr.kill()
 
             for p in grupo_projeteis:
                 if isinstance(p, BuracoNegro):

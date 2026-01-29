@@ -190,8 +190,10 @@ class GoblinV(Goblin):
 
 class Golem(Goblin):
     CHAO = 530
+
     def __init__(self, x, y, grupo_projeteis, jogador):
         super().__init__(x, y)
+
         imagem = pygame.image.load("Assets/Sprites/Inimigos/golem.png").convert_alpha()
         imagem = pygame.transform.scale(imagem, (220, 220))
         self.image_d = imagem
@@ -201,7 +203,8 @@ class Golem(Goblin):
         self.jogador = jogador
         self.velocidade = 1
         self.alcance = 120
-        self.vida = 6
+        self.vida = 2
+        self.morto = False
         self.dano = 1
         self.pulando = False
         self.vel_y = 0
@@ -212,6 +215,40 @@ class Golem(Goblin):
         self.grupo_projeteis = grupo_projeteis
         self.explosao_ativa = False
 
+    def levar_dano(self, dano):
+        if self.morto:
+            return
+        self.vida -= dano
+        if self.vida <= 0:
+            self.morto = True
+
+    def morreu(self):
+        return self.morto
+
+    def update(self):
+        if self.morto:
+            return
+
+        agora = pygame.time.get_ticks()
+
+        if not self.pulando and not self.explosao_ativa and agora - self.ultimo_stomp >= self.cooldown_stomp:
+            self.iniciar_stomp()
+
+        if self.pulando:
+            self.vel_y += self.gravidade
+            self.rect.y += self.vel_y
+            if self.rect.bottom >= 425:
+                self.rect.bottom = 425
+                self.pulando = False
+                self.vel_y = 0
+                explosao = ExplosaoGolem(self.rect.centerx, self.CHAO, dano=self.dano, golem=self)
+                self.grupo_projeteis.add(explosao)
+                self.explosao_ativa = True
+
+        if not self.pulando and not self.explosao_ativa:
+            self.patrulhar()
+
+        self.atualizar_hitbox()
     def iniciar_stomp(self):
         agora = pygame.time.get_ticks()
         if not self.pulando and not self.explosao_ativa and agora - self.ultimo_stomp >= self.cooldown_stomp:
