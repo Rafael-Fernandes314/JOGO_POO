@@ -125,6 +125,9 @@ def jogar_fase_3():
                         scroll_x += 5
                         eindein.rect.left = 200
 
+            if teclas [K_j] and not pausado:
+                eindein.atacar()
+
         if not pausado:
             sprites.update()
 

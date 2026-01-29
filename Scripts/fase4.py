@@ -126,6 +126,7 @@ def jogar_fase_4():
                 eindein.agachar(True)
             else:
                 eindein.agachar(False)
+
                 if teclas[K_a]:
                     if eindein.rect.left > 0 or scroll_x <= 0:
                         eindein.mover("esquerda")
@@ -134,6 +135,9 @@ def jogar_fase_4():
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
                         eindein.rect.left = 200
+
+            if teclas [K_j] and not pausado:
+                eindein.atacar()
 
             sprites.update()
             grupo_projeteis.update()

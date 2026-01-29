@@ -116,7 +116,7 @@ def jogar_fase_1():
                         if eindein.hitbox_ataque.colliderect(goblin_hitbox_tela):
                             goblin.levar_dano(1)
                             eindein.ja_acertou = True
-                            
+
             if teclas[K_s]:
                 eindein.agachar(True)
             else:
@@ -131,9 +131,8 @@ def jogar_fase_1():
                         scroll_x += 5
                         eindein.rect.left = 200
 
-                        
-                    if teclas[K_j]:  
-                        eindein.atacar()
+            if teclas [K_j] and not pausado:
+                eindein.atacar()
 
         if not pausado:
             sprites.update()
