@@ -31,8 +31,10 @@ class Eindein(pygame.sprite.Sprite):
 
         self.ataque_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-atacando1-d.png"))
         self.ataque_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-atacando2-d.png"))
+        self.ataque_d.append(pygame.image.load("Assets/Sprites/Player/Eidein-atacando1-d.png"))
         self.ataque_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-atacando1-e.png"))
         self.ataque_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-atacando2-e.png"))
+        self.ataque_e.append(pygame.image.load("Assets/Sprites/Player/Eidein-atacando1-e.png"))
 
         self.image = pygame.transform.scale(self.sprite_d[0], (128, 128))
         self.rect = self.image.get_rect(topleft=(100, 535))
@@ -56,7 +58,7 @@ class Eindein(pygame.sprite.Sprite):
         self.invencivel_timer = 0
 
         self.hitbox = pygame.Rect(0, 0, 20, 128)
-        self.hitbox_ataque = pygame.Rect(0, 0, 40, 40)
+        self.hitbox_ataque = pygame.Rect(0, 0, 70, 70)
 
         self.atual1 = 0
         self.atual2 = 0
@@ -78,29 +80,31 @@ class Eindein(pygame.sprite.Sprite):
                 self.invencivel_timer = 0
 
         if self.atacando:
-            self.atual_ataque += 0.2
-
+            self.atual_ataque += 0.1
             sprites = self.ataque_d if self.direcao == "direita" else self.ataque_e
 
             if self.atual_ataque >= len(sprites):
                 self.atacando = False
                 self.atual_ataque = 0
             else:
-                self.image = pygame.transform.scale(
-                    sprites[int(self.atual_ataque)], (128, 128)
-                )
+                midbottom = self.rect.midbottom
+
+                if int(self.atual_ataque) == 1:
+                    self.image = pygame.transform.scale(sprites[1], (170, 170))
+                    compensacao = 25.5
+                else:
+                    self.image = pygame.transform.scale(sprites[0], (135, 135))
+                    compensacao = 2
+
+                self.rect = self.image.get_rect()
+                self.rect.midbottom = (midbottom[0], midbottom[1] + compensacao)
 
             if self.direcao == "direita":
                 self.hitbox_ataque.midleft = self.rect.midright
             else:
                 self.hitbox_ataque.midright = self.rect.midleft
-
-            midbottom = self.rect.midbottom
-            self.rect = self.image.get_rect()
-            self.rect.midbottom = midbottom
             return
-
-        if self.agachado:
+        elif self.agachado:
             self.image = pygame.transform.scale(
                 self.sprite_agachar_d[0] if self.direcao == "direita" else self.sprite_agachar_e[0],
                 (140, 140)

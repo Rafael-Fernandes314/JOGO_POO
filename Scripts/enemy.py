@@ -203,7 +203,7 @@ class Golem(Goblin):
         self.jogador = jogador
         self.velocidade = 1
         self.alcance = 120
-        self.vida = 2
+        self.vida = 5
         self.morto = False
         self.dano = 1
         self.pulando = False
@@ -224,10 +224,6 @@ class Golem(Goblin):
 
     def morreu(self):
         return self.morto
-
-    def update(self):
-        if self.morto:
-            return
 
         agora = pygame.time.get_ticks()
 
@@ -257,6 +253,8 @@ class Golem(Goblin):
             self.ultimo_stomp = agora
 
     def update(self):
+        if self.morto:
+            return
         agora = pygame.time.get_ticks()
 
         if not self.pulando and not self.explosao_ativa and agora - self.ultimo_stomp >= self.cooldown_stomp:

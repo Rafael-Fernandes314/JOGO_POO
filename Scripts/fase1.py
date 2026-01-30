@@ -104,6 +104,8 @@ def jogar_fase_1():
                     if event.key == K_SPACE:
                         eindein.pular()
                         pulo.play()
+                    if event.key == K_j and not pausado:
+                        eindein.atacar()
 
         teclas = pygame.key.get_pressed()
 
@@ -130,9 +132,6 @@ def jogar_fase_1():
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
                         eindein.rect.left = 200
-
-            if teclas [K_j] and not pausado:
-                eindein.atacar()
 
         if not pausado:
             sprites.update()
