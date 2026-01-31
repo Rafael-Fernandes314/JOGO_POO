@@ -44,10 +44,16 @@ class Eindein(pygame.sprite.Sprite):
         self.velocidade = 3
         self.pulando = False
         self.animar = False
-
+        self.dano = 1
         self.atacando = False
+        self.atacou_esse_frame = False
         self.atual_ataque = 0
         self.ja_acertou = False
+        self.em_knockback = False
+        self.kb_vel_x = 0
+        self.kb_vel_y = 0
+        self.kb_inicio = 0
+        self.kb_duracao = 180
 
         self.agachado = False
         self.direcao = "direita"
@@ -64,6 +70,16 @@ class Eindein(pygame.sprite.Sprite):
         self.atual2 = 0
 
     def update(self):
+        if self.em_knockback:
+            self.rect.x += self.kb_vel_x
+            self.rect.y += self.kb_vel_y
+            self.kb_vel_y += self.gravidade
+
+            if pygame.time.get_ticks() - self.kb_inicio >= self.kb_duracao:
+                self.em_knockback = False
+                self.kb_vel_x = 0
+                self.kb_vel_y = 0
+
         self.vel_y += self.gravidade
         self.rect.y += self.vel_y
 
@@ -80,7 +96,7 @@ class Eindein(pygame.sprite.Sprite):
                 self.invencivel_timer = 0
 
         if self.atacando:
-            self.atual_ataque += 0.1
+            self.atual_ataque += 0.12
             sprites = self.ataque_d if self.direcao == "direita" else self.ataque_e
 
             if self.atual_ataque >= len(sprites):
@@ -103,7 +119,6 @@ class Eindein(pygame.sprite.Sprite):
                 self.hitbox_ataque.midleft = self.rect.midright
             else:
                 self.hitbox_ataque.midright = self.rect.midleft
-            return
         elif self.agachado:
             self.image = pygame.transform.scale(
                 self.sprite_agachar_d[0] if self.direcao == "direita" else self.sprite_agachar_e[0],
@@ -129,6 +144,11 @@ class Eindein(pygame.sprite.Sprite):
                     (128, 128)
                 )
 
+        if self.direcao == "direita":
+            self.hitbox_ataque.midleft = self.rect.midright
+        else:
+            self.hitbox_ataque.midright = self.rect.midleft
+
         midbottom = self.rect.midbottom
         self.rect = self.image.get_rect()
         self.rect.midbottom = midbottom
@@ -136,13 +156,21 @@ class Eindein(pygame.sprite.Sprite):
         self.hitbox.height = 64 if self.agachado else 128
         self.hitbox.midbottom = self.rect.midbottom
 
+        if self.direcao == "direita":
+            self.hitbox_ataque.midleft = self.rect.midright
+        else:
+            self.hitbox_ataque.midright = self.rect.midleft
+
     def atacar(self):
-        if not self.atacando:
+        if not self.atacando and not self.em_knockback:
             self.atacando = True
             self.atual_ataque = 0
             self.ja_acertou = False
 
     def mover(self, direcao):
+        if self.em_knockback:
+            return
+
         self.direcao = direcao
         self.animar = True
         self.rect.x += self.velocidade if direcao == "direita" else -self.velocidade
@@ -155,11 +183,27 @@ class Eindein(pygame.sprite.Sprite):
     def agachar(self, estado):
         self.agachado = estado
 
-    def levar_dano(self, qtd=1):
+    def levar_dano(self, qtd=1, direcao_inimigo=None):
         if not self.invencivel:
             self.vida -= qtd
+            if self.vida < 0:
+                self.vida = 0
+
             self.invencivel = True
             self.invencivel_timer = 0
+
+            self.em_knockback = True
+            self.kb_inicio = pygame.time.get_ticks()
+
+            forca_x = 8
+            forca_y = -6
+
+            if direcao_inimigo is not None:
+                self.kb_vel_x = -direcao_inimigo * forca_x
+            else:
+                self.kb_vel_x = -forca_x if self.direcao == "direita" else forca_x
+
+            self.kb_vel_y = forca_y
 
     def game_over(self):
         if self.vida == 0:

@@ -73,18 +73,18 @@ def jogar_fase_6():
     # lista de goblins
     elfos = [
         Elfo(2500, 530, grupo_projeteis, eindein),
-        Elfo(5000, 530, grupo_projeteis, eindein),
-        Elfo(7500, 530, grupo_projeteis, eindein),
+        Elfo(4000, 530, grupo_projeteis, eindein),
+        Elfo(5500, 530, grupo_projeteis, eindein),
+        Elfo(7000, 530, grupo_projeteis, eindein),
+        Elfo(8500, 530, grupo_projeteis, eindein),
         Elfo(10000, 530, grupo_projeteis, eindein),
-        Elfo(12500, 530, grupo_projeteis, eindein),
-        Elfo(15000, 530, grupo_projeteis, eindein),
-        Elfo(17500, 530, grupo_projeteis, eindein),
+        Elfo(11300, 530, grupo_projeteis, eindein),
     ]
     sprites.add(eindein)
-    artefato = Anel(2800, 500)
+    artefato = Anel(11800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3000 # tamanho do cenário
+    cenario_largura = 12000 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
@@ -111,8 +111,8 @@ def jogar_fase_6():
                 if not pausado and event.key == K_SPACE:
                     eindein.pular()
                     pulo.play()
-                if event.key == K_j and not pausado:
-                        eindein.atacar()
+            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
+                    eindein.atacar()
 
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
@@ -149,10 +149,18 @@ def jogar_fase_6():
                     artefato = None
 
             for elfo in elfos[:]:
+                elfo.scroll_x = scroll_x
+                elfo.largura_tela = largura
                 tela.blit(elfo.image, (elfo.rect.x - scroll_x, elfo.rect.y))
+                elfo.desenhar_barra_hp(tela, scroll_x)
                 elfo.update()
 
                 elfo_hitbox_tela = elfo.hitbox.move(-scroll_x, 0)
+
+                if eindein.atacando:
+                    if eindein.hitbox_ataque.colliderect(elfo_hitbox_tela):
+                        elfo.levar_dano(eindein.dano)
+
                 if eindein.rect.colliderect(elfo_hitbox_tela):
                     elfo.encostar_no_player(eindein)
 
@@ -199,7 +207,7 @@ def jogar_fase_6():
 
         pygame.display.flip()
 
-        if eindein.rect.x + scroll_x >= cenario_largura:
+        if not pausado and eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
             fade(tela, largura, altura)
             from fase7 import jogar_fase_7

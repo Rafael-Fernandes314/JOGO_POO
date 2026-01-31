@@ -40,3 +40,11 @@ def desenhar_hud(tela, largura, altura):
     if artefatos_coletados["anel"]:
         tela.blit(anel, (pos_x, pos_y))
         pos_x -= 80
+    
+    if artefatos_coletados["emblema"]:
+        tela.blit(anel, (pos_x, pos_y))
+        pos_x -= 80
+    
+    if artefatos_coletados["sangue"]:
+        tela.blit(anel, (pos_x, pos_y))
+        pos_x -= 80

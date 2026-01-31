@@ -63,18 +63,18 @@ def jogar_fase_2():
     # lista de goblins
     ladrões = [
         Ladrão(2500, 530),
-        Ladrão(5000, 530),
-        Ladrão(7500, 530),
+        Ladrão(4000, 530),
+        Ladrão(5500, 530),
+        Ladrão(7000, 530),
+        Ladrão(8500, 530),
         Ladrão(10000, 530),
-        Ladrão(12500, 530),
-        Ladrão(15000, 530),
-        Ladrão(17500, 530),
+        Ladrão(11300, 530),
     ]
     sprites.add(eindein)
 
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3000 # tamanho do cenário
+    cenario_largura = 12000 # tamanho do cenário
 
     fadein = True
     fade_alpha = 255
@@ -105,8 +105,8 @@ def jogar_fase_2():
                     if event.key == K_SPACE:
                         eindein.pular()
                         pulo.play()
-                    if event.key == K_j and not pausado:
-                        eindein.atacar()
+            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
+                    eindein.atacar()
 
         # teclas que tão sendo seguradas
         if not pausado:
@@ -150,6 +150,7 @@ def jogar_fase_2():
         sprites.draw(tela)
         for ladrão in ladrões:
             tela.blit(ladrão.image, (ladrão.rect.x - scroll_x, ladrão.rect.y))
+            ladrão.desenhar_barra_hp(tela, scroll_x)
 
         for i in range(eindein.vida_max):
             if i < eindein.vida:
@@ -183,7 +184,7 @@ def jogar_fase_2():
 
         pygame.display.flip()  # atualiza a tela
 
-        if eindein.rect.x + scroll_x >= 3000:
+        if not pausado and eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
             fade(tela,largura,altura)
             from fase3 import jogar_fase_3

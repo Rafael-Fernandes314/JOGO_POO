@@ -72,18 +72,18 @@ def jogar_fase_7():
     # lista de goblins
     xamãs = [
         Xamã(2500, 530),
-        Xamã(5000, 530),
-        Xamã(7500, 530),
+        Xamã(4000, 530),
+        Xamã(5500, 530),
+        Xamã(7000, 530),
+        Xamã(8500, 530),
         Xamã(10000, 530),
-        Xamã(12500, 530),
-        Xamã(15000, 530),
-        Xamã(17500, 530),
+        Xamã(11300, 530),
     ]
     sprites.add(eindein)
-    artefato = Emblema(2800, 500)
+    artefato = Emblema(11800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3000 # tamanho do cenário
+    cenario_largura = 12000 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
@@ -114,6 +114,8 @@ def jogar_fase_7():
                 if not pausado and event.key == K_SPACE:
                     eindein.pular()
                     pulo.play()
+            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
+                    eindein.atacar()
 
         teclas = pygame.key.get_pressed()
 
@@ -132,11 +134,21 @@ def jogar_fase_7():
                         scroll_x += 5
                         eindein.rect.left = 200
 
-            for xamã in xamãs:
+            for xamã in xamãs[:]:
                 xamã.update()
                 xamã.causar_dano(eindein, scroll_x)
                 xamã.desenhar_aura(tela, scroll_x)
+
+                if eindein.atacando:
+                    if eindein.hitbox_ataque.colliderect(xamã.hitbox.move(-scroll_x, 0)):
+                        xamã.levar_dano(1)
+
+                if xamã.morreu():
+                    xamãs.remove(xamã)
+                    continue
+
                 tela.blit(xamã.image, (xamã.rect.x - scroll_x, xamã.rect.y))
+                xamã.desenhar_barra_hp(tela, scroll_x)
 
             sprites.update()
             sprites.draw(tela)
@@ -164,10 +176,10 @@ def jogar_fase_7():
             return
 
         if fadein:
-            fade = pygame.Surface((largura, altura))
-            fade.fill((0, 0, 0))
-            fade.set_alpha(fade_alpha)
-            tela.blit(fade, (0, 0))
+            fade_surface = pygame.Surface((largura, altura))
+            fade_surface.fill((0, 0, 0))
+            fade_surface.set_alpha(fade_alpha)
+            tela.blit(fade_surface, (0, 0))
             fade_alpha -= 5
             if fade_alpha <= 0:
                 fadein = False
@@ -179,7 +191,7 @@ def jogar_fase_7():
 
         pygame.display.flip()
 
-        if eindein.rect.x + scroll_x >= 3000:
+        if not pausado and eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
             fade(tela, largura, altura)
             from fase8 import jogar_fase_8

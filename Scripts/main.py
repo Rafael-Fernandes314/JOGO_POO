@@ -6,6 +6,9 @@ from fase4 import jogar_fase_4
 from fase5 import jogar_fase_5
 from fase6 import jogar_fase_6
 from fase7 import jogar_fase_7
+from fase8 import jogar_fase_8
+from fase9 import jogar_fase_9
+from final import tela_final
 from gameover import Game_over
 import estado_jogo
 
@@ -13,6 +16,8 @@ def main():
     mostrar_menu()
 
     while True:
+        if estado_jogo.fase_atual == 0:
+            mostrar_menu()
         if estado_jogo.fase_atual == 1:
             jogar_fase_1()
         elif estado_jogo.fase_atual == 2:
@@ -27,6 +32,12 @@ def main():
             jogar_fase_6()
         elif estado_jogo.fase_atual == 7:
             jogar_fase_7()
+        elif estado_jogo.fase_atual == 8:
+            jogar_fase_8()
+        elif estado_jogo.fase_atual == 9:
+            jogar_fase_9()
+        elif estado_jogo.fase_atual == 10:
+            tela_final()
 
 if __name__ == "__main__":
     main()

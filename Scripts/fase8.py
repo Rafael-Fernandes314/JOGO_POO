@@ -2,8 +2,8 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from dr_g import Dr_G, BuracoNegro
-from artefato import Escudo
+from enemy import GoblinV
+from artefato import Sangue
 from hud import desenhar_hud
 from inventario import artefatos_coletados
 import estado_jogo
@@ -17,8 +17,7 @@ def fade(tela, largura, altura):
         pygame.display.update()
         pygame.time.delay(3)
 
-def jogar_fase_5():
-
+def jogar_fase_8():
     pygame.init()
 
     # tamanho da tela
@@ -63,59 +62,57 @@ def jogar_fase_5():
     coração_preto = pygame.transform.scale(coração_preto, (120, 120))
 
     # carrega o fundo
-    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase5.png").convert()
+    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase8.png").convert()
     fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     # sprites
     sprites = pygame.sprite.Group()
-    grupo_inimigos = pygame.sprite.Group()
-    grupo_projeteis = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    dr_g = [
-        Dr_G(2500, 530, grupo_inimigos, grupo_projeteis),
+    goblins = [
+        GoblinV(2500, 530),
+        GoblinV(5000, 530),
+        GoblinV(7500, 530),
+        GoblinV(10000, 530),
+        GoblinV(12500, 530),
+        GoblinV(15000, 530),
+        GoblinV(17500, 530),
     ]
     sprites.add(eindein)
-    artefato = Escudo(3300, 500)
+    artefato = Sangue(2800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3500 # tamanho do cenário
+    cenario_largura = 3000 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
 
     fadein = True
     fade_alpha = 255
-    estado_jogo.fase_atual = 5
-    estado_jogo.vida_max_jogador = 5
+    estado_jogo.fase_atual = 3
+    estado_jogo.vida_max_jogador = 4
 
     # loop do jogo
     while True:
         relógio.tick(60)
-        tela.fill(PRETO)
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 exit()
-
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     pausado = not pausado
-
-                if not pausado and event.key == K_SPACE:
-                    eindein.pular()
-                    pulo.play()
+                if not pausado:
+                    if event.key == K_SPACE:
+                        eindein.pular()
+                        pulo.play()
             if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
                     eindein.atacar()
 
-        for i in range(cenario_largura // fundo_img.get_width() + 1):
-            x = i * fundo_img.get_width() - scroll_x
-            tela.blit(fundo_img, (x, 0))
+        teclas = pygame.key.get_pressed()
 
         if not pausado:
-            teclas = pygame.key.get_pressed()
-
             if teclas[K_s]:
                 eindein.agachar(True)
             else:
@@ -130,68 +127,50 @@ def jogar_fase_5():
                         scroll_x += 5
                         eindein.rect.left = 200
 
+        if not pausado:
             sprites.update()
+
+            if eindein.atacando and not eindein.ja_acertou:
+                if 0.9 <= eindein.atual_ataque <= 1.1:
+                    for goblin in goblins:
+                        goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+                        if eindein.hitbox_ataque.colliderect(goblin_hitbox_tela):
+                            goblin.levar_dano(1)
+                            eindein.ja_acertou = True
 
             if artefato:
                 artefato.update()
-                if eindein.rect.colliderect(artefato.hitbox.move(-scroll_x, 0)):
+                artefato_hitbox_tela = artefato.hitbox.move(-scroll_x, 0)
+                if eindein.rect.colliderect(artefato_hitbox_tela):
                     coletar.play()
-                    artefatos_coletados["escudo"] = True
+                    artefatos_coletados["sangue"] = True
                     artefato = None
 
-            for dr in dr_g[:]:
-                dr.update()
+            for goblin in goblins[:]:
+                goblin.update()
+                goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
 
-                if eindein.atacando:
-                    dr_hitbox_tela = dr.hitbox.move(-scroll_x, 0)
+                if eindein.rect.colliderect(goblin_hitbox_tela):
+                    goblin.encostar_no_player(eindein)
+                if goblin.morreu():
+                    goblins.remove(goblin)
 
-                    if eindein.hitbox_ataque.colliderect(dr_hitbox_tela):
-                        dr.levar_dano(1)
+        tela.fill(PRETO)
 
-                if eindein.rect.colliderect(dr.hitbox.move(-scroll_x, 0)):
-                    dr.encostar_no_player(eindein)
+        for i in range(cenario_largura // fundo_img.get_width() + 1):
+            x = i * fundo_img.get_width() - scroll_x
+            tela.blit(fundo_img, (x, 0))
 
-                if dr.morreu():
-                    dr_g.remove(dr)
-
-            for p in grupo_projeteis:
-                if isinstance(p, BuracoNegro):
-                    p.update(eindein)
-                else:
-                    p.update()
-
-                if p.hitbox.move(-scroll_x, 0).colliderect(eindein.rect):
-                    eindein.levar_dano(1)
-                    p.kill()
-
-            for inimigo in grupo_inimigos.copy():
-                inimigo.update()
-
-                if eindein.atacando:
-                    if eindein.hitbox_ataque.colliderect(inimigo.hitbox.move(-scroll_x, 0)):
-                        inimigo.levar_dano(eindein.dano)
-
-                if inimigo.hitbox.move(-scroll_x, 0).colliderect(eindein.rect):
-                    inimigo.encostar_no_player(eindein)
-
-                if inimigo.morreu():
-                    inimigo.kill()
-
+        # sprites
         sprites.draw(tela)
 
+        # artefato
         if artefato:
             tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
 
-        for dr in dr_g:
-            tela.blit(dr.image, (dr.rect.x - scroll_x, dr.rect.y))
-            dr.desenhar_nome(tela, scroll_x)
-            dr.desenhar_barra_hp(tela, scroll_x)
-
-        for p in grupo_projeteis:
-            tela.blit(p.image, (p.rect.x - scroll_x, p.rect.y))
-
-        for inimigo in grupo_inimigos:
-            tela.blit(inimigo.image, (inimigo.rect.x - scroll_x, inimigo.rect.y))
+        # goblins
+        for goblin in goblins:
+            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
 
         for i in range(eindein.vida_max):
             if i < eindein.vida:
@@ -199,7 +178,7 @@ def jogar_fase_5():
             else:
                 tela.blit(coração_preto, (10 + i * 70, 10))
 
-        if eindein.vida == 0:
+        if not pausado and eindein.vida == 0:
             pygame.mixer.music.stop()
             from gameover import Game_over
             Game_over()
@@ -214,18 +193,19 @@ def jogar_fase_5():
             if fade_alpha <= 0:
                 fadein = False
 
-        desenhar_hud(tela, largura, altura)
-
         if pausado:
+            overlay = pygame.Surface((largura, altura), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
             tela.blit(overlay, (0, 0))
             tela.blit(logo_pause, rect_logo_pause)
             tela.blit(texto_pause, rect_texto_pause)
 
+        desenhar_hud(tela, largura, altura)
         pygame.display.flip()
 
         if not pausado and eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
             fade(tela, largura, altura)
-            from fase6 import jogar_fase_6
-            jogar_fase_6()
+            from fase9 import jogar_fase_9
+            jogar_fase_9()
             return

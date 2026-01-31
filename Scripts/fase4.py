@@ -18,7 +18,7 @@ def fade(tela, largura, altura):
         pygame.time.delay(3)
 
 def jogar_fase_4():
-
+    
     pygame.init()
 
     # tamanho da tela
@@ -73,18 +73,18 @@ def jogar_fase_4():
     # lista de goblins
     golens = [
         Golem(2500, 530, grupo_projeteis, eindein),
-        Golem(5000, 530, grupo_projeteis, eindein),
-        Golem(7500, 530, grupo_projeteis, eindein),
+        Golem(4000, 530, grupo_projeteis, eindein),
+        Golem(5500, 530, grupo_projeteis, eindein),
+        Golem(7000, 530, grupo_projeteis, eindein),
+        Golem(8500, 530, grupo_projeteis, eindein),
         Golem(10000, 530, grupo_projeteis, eindein),
-        Golem(12500, 530, grupo_projeteis, eindein),
-        Golem(15000, 530, grupo_projeteis, eindein),
-        Golem(17500, 530, grupo_projeteis, eindein),
+        Golem(11300, 530, grupo_projeteis, eindein),
     ]
     sprites.add(eindein)
-    artefato = Espada(2800, 500)
+    artefato = Espada(11800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3000 # tamanho do cenário
+    cenario_largura = 12000 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
@@ -112,8 +112,8 @@ def jogar_fase_4():
                     if event.key == K_SPACE:
                         eindein.pular()
                         pulo.play()
-                    if event.key == K_j and not pausado:
-                        eindein.atacar()
+            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
+                    eindein.atacar()
 
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
@@ -153,15 +153,12 @@ def jogar_fase_4():
 
             for golem in golens[:]:
                 tela.blit(golem.image, (golem.rect.x - scroll_x, golem.rect.y))
+                golem.desenhar_barra_hp(tela, scroll_x)
                 golem.update()
-
-                if not hasattr(golem, "atingido_no_ataque"):
-                    golem.atingido_no_ataque = False
-
-                if (eindein.atacando and not golem.atingido_no_ataque and 0.4 <= eindein.atual_ataque <= 1.2):
-                    hitbox_ataque_tela = eindein.hitbox_ataque.move(-scroll_x, 0)
-
-                    if hitbox_ataque_tela.colliderect(golem.hitbox):
+                
+                if (eindein.atacando and not golem.atingido_no_ataque and 0.2 <= eindein.atual_ataque <= 1.6):
+                    golem_hitbox_tela = golem.hitbox.move(-scroll_x, 0)
+                    if eindein.hitbox_ataque.colliderect(golem_hitbox_tela):
                         golem.levar_dano(eindein.dano)
                         golem.atingido_no_ataque = True
                 if not eindein.atacando:
@@ -173,6 +170,7 @@ def jogar_fase_4():
 
                 if golem.morreu():
                     golens.remove(golem)
+                    continue
 
             for proj in grupo_projeteis:
                 tela.blit(proj.image, (proj.rect.x - scroll_x, proj.rect.y))
@@ -218,7 +216,7 @@ def jogar_fase_4():
 
         pygame.display.flip()
 
-        if eindein.rect.x + scroll_x >= 3000:
+        if not pausado and eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
             fade(tela, largura, altura)
             from fase5 import jogar_fase_5

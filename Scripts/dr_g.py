@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import random
 import math
+from enemy import Goblin
 from enemy import *
 
 pygame.init()
@@ -23,12 +24,11 @@ class Dr_G(pygame.sprite.Sprite):
         self.image = self.image_e
         self.rect = self.image.get_rect(midbottom=(x, y))
 
-        self.hitbox = pygame.Rect(0, 0, 120, 160)
+        self.hitbox = pygame.Rect(0, 0, 60, 160)
         self.hitbox.center = self.rect.center
 
         self.grupo_inimigos = grupo_inimigos
         self.grupo_projeteis = grupo_projeteis
-
         self.vida_max = 20
         self.vida = self.vida_max
         self.hp_largura = 120
@@ -38,15 +38,26 @@ class Dr_G(pygame.sprite.Sprite):
         self.alcance = 120
         self.x_inicial = self.rect.x
         self.atacando = False
-
+        self.tomou_dano = False
         self.ultimo_ataque = 0
-        self.cooldown_ataque = 2500
+        self.cooldown_ataque = 3500
+        self.tempo_ultimo_dano = 0
+        self.cooldown_dano = 400
 
     def mover(self):
         self.rect.x += self.velocidade * self.direcao
 
         if abs(self.rect.x - self.x_inicial) >= self.alcance:
             self.direcao *= -1
+
+    def levar_dano(self, dano):
+        agora = pygame.time.get_ticks()
+        if agora - self.tempo_ultimo_dano >= self.cooldown_dano:
+            self.vida -= dano
+            self.tempo_ultimo_dano = agora
+
+            if self.vida < 0:
+                self.vida = 0
 
     def morreu(self):
         return self.vida <= 0
@@ -61,13 +72,22 @@ class Dr_G(pygame.sprite.Sprite):
         )
         tela.blit(texto, rect_texto)
 
-    
     def desenhar_barra_hp(self, tela, scroll_x):
-        fundo = pygame.Rect(self.rect.centerx - self.hp_largura // 2 - scroll_x,self.rect.top - 5,self.hp_largura,self.hp_altura)
-
+        fundo = pygame.Rect(
+            self.rect.centerx - self.hp_largura // 2 - scroll_x,
+            self.rect.top - 10,
+            self.hp_largura,
+            self.hp_altura
+        )
         proporcao = self.vida / self.vida_max
-        vida_atual = pygame.Rect(fundo.x,fundo.y,int(self.hp_largura * proporcao),self.hp_altura)
+        largura_atual = int(self.hp_largura * proporcao)
 
+        vida_atual = pygame.Rect(
+            fundo.x,
+            fundo.y,
+            largura_atual,
+            self.hp_altura
+        )
         pygame.draw.rect(tela, (120, 0, 0), fundo)
         pygame.draw.rect(tela, (0, 200, 0), vida_atual)
 
@@ -130,6 +150,9 @@ class Dr_G(pygame.sprite.Sprite):
         if agora - self.ultimo_ataque >= self.cooldown_ataque:
             self.escolher_ataque()
             self.ultimo_ataque = agora
+        
+        if not pygame.mouse.get_pressed()[0]:
+            self.tomou_dano = False
 
 class ProjetilDrG(pygame.sprite.Sprite):
     def __init__(self, x, y, direcao):

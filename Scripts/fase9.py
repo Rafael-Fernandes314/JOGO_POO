@@ -2,10 +2,8 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from dr_g import Dr_G, BuracoNegro
-from artefato import Escudo
+from enemy import Ladrão
 from hud import desenhar_hud
-from inventario import artefatos_coletados
 import estado_jogo
 
 def fade(tela, largura, altura):
@@ -17,8 +15,7 @@ def fade(tela, largura, altura):
         pygame.display.update()
         pygame.time.delay(3)
 
-def jogar_fase_5():
-
+def jogar_fase_9():
     pygame.init()
 
     # tamanho da tela
@@ -32,6 +29,8 @@ def jogar_fase_5():
     tela = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption("Herdeiros do Fim")
 
+    pausado = False
+
     logo_pause = pygame.image.load("Assets/Sprites/UI/jogo_pausado.png").convert_alpha()
     logo_pause = pygame.transform.scale(logo_pause, (500, 250))
     rect_logo_pause = logo_pause.get_rect(center=(largura // 2, altura // 2 - 100))
@@ -40,21 +39,13 @@ def jogar_fase_5():
     texto_pause = fonte_pause.render("Pressione ESC para continuar", True, (255, 255, 255))
     rect_texto_pause = texto_pause.get_rect(center=(largura // 2, altura // 2 + 120))
 
-    pausado = False
-
-    overlay = pygame.Surface((largura, altura))
-    overlay.fill((0, 0, 0))
-    overlay.set_alpha(160)
-
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/fase3.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/fase2.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
     pulo = pygame.mixer.Sound("Assets/Sons/Efeitos/pulo.mp3")
     pulo.set_volume(0.5)
-    coletar = pygame.mixer.Sound("Assets/Sons/Efeitos/coletar_artefato.mp3")
-    coletar.set_volume(0.7)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -63,37 +54,44 @@ def jogar_fase_5():
     coração_preto = pygame.transform.scale(coração_preto, (120, 120))
 
     # carrega o fundo
-    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase5.png").convert()
+    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase9.png").convert()
     fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     # sprites
     sprites = pygame.sprite.Group()
-    grupo_inimigos = pygame.sprite.Group()
-    grupo_projeteis = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    dr_g = [
-        Dr_G(2500, 530, grupo_inimigos, grupo_projeteis),
+    ladrões = [
+        Ladrão(2500, 530),
+        Ladrão(5000, 530),
+        Ladrão(7500, 530),
+        Ladrão(10000, 530),
+        Ladrão(12500, 530),
+        Ladrão(15000, 530),
+        Ladrão(17500, 530),
     ]
     sprites.add(eindein)
-    artefato = Escudo(3300, 500)
+
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3500 # tamanho do cenário
-
-    tela.blit(fundo_img, (0, 0))
-    pygame.display.flip()
+    cenario_largura = 3000 # tamanho do cenário
 
     fadein = True
     fade_alpha = 255
-    estado_jogo.fase_atual = 5
-    estado_jogo.vida_max_jogador = 5
+    estado_jogo.fase_atual = 2
+    estado_jogo.vida_max_jogador = 4
 
     # loop do jogo
     while True:
-        relógio.tick(60)
+        relógio.tick(60) # 60 fps
         tela.fill(PRETO)
 
+        for i in range(cenario_largura // fundo_img.get_width() + 1):
+            x = i * fundo_img.get_width() - scroll_x
+            tela.blit(fundo_img, (x, 0))
+
+
+        # eventos do jogo
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -103,16 +101,14 @@ def jogar_fase_5():
                 if event.key == K_ESCAPE:
                     pausado = not pausado
 
-                if not pausado and event.key == K_SPACE:
-                    eindein.pular()
-                    pulo.play()
+                if not pausado:
+                    if event.key == K_SPACE:
+                        eindein.pular()
+                        pulo.play()
             if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
                     eindein.atacar()
 
-        for i in range(cenario_largura // fundo_img.get_width() + 1):
-            x = i * fundo_img.get_width() - scroll_x
-            tela.blit(fundo_img, (x, 0))
-
+        # teclas que tão sendo seguradas
         if not pausado:
             teclas = pygame.key.get_pressed()
 
@@ -132,66 +128,28 @@ def jogar_fase_5():
 
             sprites.update()
 
-            if artefato:
-                artefato.update()
-                if eindein.rect.colliderect(artefato.hitbox.move(-scroll_x, 0)):
-                    coletar.play()
-                    artefatos_coletados["escudo"] = True
-                    artefato = None
+            if eindein.atacando and not eindein.ja_acertou:
+                if 0.9 <= eindein.atual_ataque <= 1.1:
+                    for ladrão in ladrões:
+                        ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
+                        if eindein.hitbox_ataque.colliderect(ladrão_hitbox_tela):
+                            ladrão.levar_dano(1)
+                            eindein.ja_acertou = True
 
-            for dr in dr_g[:]:
-                dr.update()
 
-                if eindein.atacando:
-                    dr_hitbox_tela = dr.hitbox.move(-scroll_x, 0)
+            for ladrão in ladrões[:]:
+                ladrão.update()
+                ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
 
-                    if eindein.hitbox_ataque.colliderect(dr_hitbox_tela):
-                        dr.levar_dano(1)
+                if eindein.rect.colliderect(ladrão_hitbox_tela):
+                    ladrão.encostar_no_player(eindein)
 
-                if eindein.rect.colliderect(dr.hitbox.move(-scroll_x, 0)):
-                    dr.encostar_no_player(eindein)
-
-                if dr.morreu():
-                    dr_g.remove(dr)
-
-            for p in grupo_projeteis:
-                if isinstance(p, BuracoNegro):
-                    p.update(eindein)
-                else:
-                    p.update()
-
-                if p.hitbox.move(-scroll_x, 0).colliderect(eindein.rect):
-                    eindein.levar_dano(1)
-                    p.kill()
-
-            for inimigo in grupo_inimigos.copy():
-                inimigo.update()
-
-                if eindein.atacando:
-                    if eindein.hitbox_ataque.colliderect(inimigo.hitbox.move(-scroll_x, 0)):
-                        inimigo.levar_dano(eindein.dano)
-
-                if inimigo.hitbox.move(-scroll_x, 0).colliderect(eindein.rect):
-                    inimigo.encostar_no_player(eindein)
-
-                if inimigo.morreu():
-                    inimigo.kill()
+                if ladrão.morreu():
+                    ladrões.remove(ladrão)
 
         sprites.draw(tela)
-
-        if artefato:
-            tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
-
-        for dr in dr_g:
-            tela.blit(dr.image, (dr.rect.x - scroll_x, dr.rect.y))
-            dr.desenhar_nome(tela, scroll_x)
-            dr.desenhar_barra_hp(tela, scroll_x)
-
-        for p in grupo_projeteis:
-            tela.blit(p.image, (p.rect.x - scroll_x, p.rect.y))
-
-        for inimigo in grupo_inimigos:
-            tela.blit(inimigo.image, (inimigo.rect.x - scroll_x, inimigo.rect.y))
+        for ladrão in ladrões:
+            tela.blit(ladrão.image, (ladrão.rect.x - scroll_x, ladrão.rect.y))
 
         for i in range(eindein.vida_max):
             if i < eindein.vida:
@@ -204,7 +162,7 @@ def jogar_fase_5():
             from gameover import Game_over
             Game_over()
             return
-
+        
         if fadein:
             fade_surface = pygame.Surface((largura, altura))
             fade_surface.fill((0, 0, 0))
@@ -213,19 +171,21 @@ def jogar_fase_5():
             fade_alpha -= 5
             if fade_alpha <= 0:
                 fadein = False
-
+        
         desenhar_hud(tela, largura, altura)
 
         if pausado:
+            overlay = pygame.Surface((largura, altura), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
             tela.blit(overlay, (0, 0))
             tela.blit(logo_pause, rect_logo_pause)
             tela.blit(texto_pause, rect_texto_pause)
 
-        pygame.display.flip()
+        pygame.display.flip()  # atualiza a tela
 
-        if not pausado and eindein.rect.x + scroll_x >= cenario_largura:
+        if eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
-            fade(tela, largura, altura)
-            from fase6 import jogar_fase_6
-            jogar_fase_6()
+            fade(tela,largura,altura)
+            from final import tela_final
+            tela_final()
             return
