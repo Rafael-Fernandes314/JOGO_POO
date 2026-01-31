@@ -112,13 +112,13 @@ def jogar_fase_4():
                     if event.key == K_SPACE:
                         eindein.pular()
                         pulo.play()
+                    if event.key == K_j and not pausado:
+                        eindein.atacar()
 
-        # ===== CENÁRIO (sempre desenha) =====
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
 
-        # ===== JOGO RODANDO =====
         if not pausado:
             teclas = pygame.key.get_pressed()
 
@@ -135,9 +135,6 @@ def jogar_fase_4():
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
                         eindein.rect.left = 200
-
-            if teclas [K_j] and not pausado:
-                eindein.atacar()
 
             sprites.update()
             grupo_projeteis.update()
@@ -161,7 +158,7 @@ def jogar_fase_4():
                 if not hasattr(golem, "atingido_no_ataque"):
                     golem.atingido_no_ataque = False
 
-                if (eindein.atacando and not golem.atingido_no_ataque and 0.9 <= eindein.atual_ataque <= 1.1):
+                if (eindein.atacando and not golem.atingido_no_ataque and 0.4 <= eindein.atual_ataque <= 1.2):
                     hitbox_ataque_tela = eindein.hitbox_ataque.move(-scroll_x, 0)
 
                     if hitbox_ataque_tela.colliderect(golem.hitbox):
@@ -189,7 +186,6 @@ def jogar_fase_4():
                         eindein.levar_dano(proj.dano)
                         proj.dano_aplicado = True
 
-        # ===== VIDA (sempre aparece) =====
         for i in range(eindein.vida_max):
             if i < eindein.vida:
                 tela.blit(coração_vermelho, (10 + i * 70, 10))

@@ -106,6 +106,8 @@ def jogar_fase_5():
                 if not pausado and event.key == K_SPACE:
                     eindein.pular()
                     pulo.play()
+                if event.key == K_j and not pausado:
+                        eindein.atacar()
 
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
@@ -127,9 +129,6 @@ def jogar_fase_5():
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
                         eindein.rect.left = 200
-
-            if teclas [K_j] and not pausado:
-                eindein.atacar()
 
             sprites.update()
 

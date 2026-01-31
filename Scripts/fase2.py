@@ -105,6 +105,8 @@ def jogar_fase_2():
                     if event.key == K_SPACE:
                         eindein.pular()
                         pulo.play()
+                    if event.key == K_j and not pausado:
+                        eindein.atacar()
 
         # teclas que tão sendo seguradas
         if not pausado:
@@ -123,9 +125,6 @@ def jogar_fase_2():
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
                         eindein.rect.left = 200
-
-            if teclas [K_j] and not pausado:
-                eindein.atacar()
 
             sprites.update()
 

@@ -98,12 +98,10 @@ def jogar_fase_7():
         relógio.tick(60)
         tela.fill(PRETO)
 
-        # ===== CENÁRIO (sempre) =====
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
 
-        # ===== EVENTOS =====
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -119,7 +117,6 @@ def jogar_fase_7():
 
         teclas = pygame.key.get_pressed()
 
-        # ===== JOGO RODANDO =====
         if not pausado:
             if teclas[K_s]:
                 eindein.agachar(True)
@@ -135,21 +132,15 @@ def jogar_fase_7():
                         scroll_x += 5
                         eindein.rect.left = 200
 
-            if teclas [K_j] and not pausado:
-                eindein.atacar()
-
-            # ===== XAMÃS =====
             for xamã in xamãs:
                 xamã.update()
                 xamã.causar_dano(eindein, scroll_x)
                 xamã.desenhar_aura(tela, scroll_x)
                 tela.blit(xamã.image, (xamã.rect.x - scroll_x, xamã.rect.y))
 
-            # ===== SPRITES =====
             sprites.update()
             sprites.draw(tela)
 
-            # ===== ARTEFATO =====
             if artefato:
                 tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
                 artefato.update()
@@ -158,7 +149,6 @@ def jogar_fase_7():
                     artefatos_coletados["emblema"] = True
                     artefato = None
 
-        # ===== VIDA =====
         for i in range(eindein.vida_max):
             if i < eindein.vida:
                 tela.blit(coração_vermelho, (10 + i * 70, 10))
@@ -173,7 +163,6 @@ def jogar_fase_7():
             Game_over()
             return
 
-        # ===== FADE IN =====
         if fadein:
             fade = pygame.Surface((largura, altura))
             fade.fill((0, 0, 0))
@@ -183,7 +172,6 @@ def jogar_fase_7():
             if fade_alpha <= 0:
                 fadein = False
 
-        # ===== PAUSE =====
         if pausado:
             tela.blit(overlay, (0, 0))
             tela.blit(logo_pause, rect_logo_pause)
@@ -191,7 +179,6 @@ def jogar_fase_7():
 
         pygame.display.flip()
 
-        # ===== TROCA DE FASE =====
         if eindein.rect.x + scroll_x >= 3000:
             pygame.mixer.music.stop()
             fade(tela, largura, altura)

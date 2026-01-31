@@ -99,7 +99,6 @@ def jogar_fase_6():
         relógio.tick(60)  # 60 fps
         tela.fill(PRETO)
 
-        # ===== EVENTOS =====
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -112,15 +111,15 @@ def jogar_fase_6():
                 if not pausado and event.key == K_SPACE:
                     eindein.pular()
                     pulo.play()
+                if event.key == K_j and not pausado:
+                        eindein.atacar()
 
-        # ===== CENÁRIO (sempre desenha) =====
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
 
         teclas = pygame.key.get_pressed()
 
-        # ===== JOGO RODANDO =====
         if not pausado:
             if teclas[K_s]:
                 eindein.agachar(True)
@@ -136,13 +135,9 @@ def jogar_fase_6():
                         scroll_x += 5
                         eindein.rect.left = 200
 
-            if teclas [K_j] and not pausado:
-                eindein.atacar()
-
             sprites.update()
             sprites.draw(tela)
 
-            # ===== ARTEFATO =====
             if artefato:
                 tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
                 artefato.update()
@@ -153,7 +148,6 @@ def jogar_fase_6():
                     artefatos_coletados["anel"] = True
                     artefato = None
 
-            # ===== ELFOS =====
             for elfo in elfos[:]:
                 tela.blit(elfo.image, (elfo.rect.x - scroll_x, elfo.rect.y))
                 elfo.update()
@@ -165,7 +159,6 @@ def jogar_fase_6():
                 if elfo.morreu():
                     elfos.remove(elfo)
 
-            # ===== PROJÉTEIS =====
             grupo_projeteis.update()
             for flecha in grupo_projeteis:
                 tela.blit(flecha.image, (flecha.rect.x - scroll_x, flecha.rect.y))
@@ -176,7 +169,6 @@ def jogar_fase_6():
                     flecha.dano_aplicado = True
                     flecha.kill()
 
-        # ===== VIDA (sempre desenha) =====
         for i in range(eindein.vida_max):
             if i < eindein.vida:
                 tela.blit(coração_vermelho, (10 + i * 70, 10))
@@ -189,7 +181,6 @@ def jogar_fase_6():
             Game_over()
             return
 
-        # ===== FADE IN =====
         if fadein:
             fade_surface = pygame.Surface((largura, altura))
             fade_surface.fill((0, 0, 0))
@@ -201,7 +192,6 @@ def jogar_fase_6():
 
         desenhar_hud(tela, largura, altura)
 
-        # ===== PAUSE =====
         if pausado:
             tela.blit(overlay, (0, 0))
             tela.blit(logo_pause, rect_logo_pause)
@@ -209,7 +199,6 @@ def jogar_fase_6():
 
         pygame.display.flip()
 
-        # ===== TROCA DE FASE =====
         if eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
             fade(tela, largura, altura)
