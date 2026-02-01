@@ -30,6 +30,40 @@ Neste jogo, você controla personagens em um mundo repleto de fases, inimigos e 
 - Rafael Fernandes Martins
 - Michel Jackson Bezerra
 
-## Documentação Completa
+---
 
-Acesse o cronograma de desenvolvimento, funcionalidades e estrutura de pastas na Wiki do projeto: https://github.com/Rafael-Fernandes314/JOGO_POO/wiki
+# Herdeiros do Fim
+
+*Herdeiros do Fim* is a Python RPG-Adventure game, developed as a project from a subject called **Object-Oriented Programming**, taught ny teacher Max Miller.
+
+In this game, you control a character in a world full of phases, enemies and challenges, with the target to collect strange artifacts and restore peace.
+
+## Technologies used
+
+- Python 3.11.9
+- Pygame 2.6.1
+
+## How to Run The Game
+
+1. Clone the repository:
+
+   * https://github.com/Rafael-Fernandes314/JOGO_POO
+
+2. Install the dependencies:
+
+   * https://github.com/Rafael-Fernandes314/JOGO_POO/blob/main/requirements.txt
+
+3. Execute the game:
+
+   * python main.py
+
+> Make  sure you have Python 3.11+ installed and Pygame correctly configured.
+
+## Authors
+
+- Rafael Fernandes Martins
+- Michel Jackson Bezerra
+
+## Full Documentation
+
+Acess the development timeline, features and folder structure on the project's Wiki: https://github.com/Rafael-Fernandes314/JOGO_POO/wiki
