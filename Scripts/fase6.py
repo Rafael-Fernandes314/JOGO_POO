@@ -47,7 +47,7 @@ def jogar_fase_6():
     overlay.set_alpha(160)
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/fase3.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/fase6.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
@@ -55,6 +55,8 @@ def jogar_fase_6():
     pulo.set_volume(0.5)
     coletar = pygame.mixer.Sound("Assets/Sons/Efeitos/coletar_artefato.mp3")
     coletar.set_volume(0.7)
+    ataque = pygame.mixer.Sound("Assets/Sons/Efeitos/ataque.mp3")
+    ataque.set_volume(0.5)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -78,13 +80,12 @@ def jogar_fase_6():
         Elfo(7000, 530, grupo_projeteis, eindein),
         Elfo(8500, 530, grupo_projeteis, eindein),
         Elfo(10000, 530, grupo_projeteis, eindein),
-        Elfo(11300, 530, grupo_projeteis, eindein),
     ]
     sprites.add(eindein)
-    artefato = Anel(11800, 500)
+    artefato = Anel(10300, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 12000 # tamanho do cenário
+    cenario_largura = 10500 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
@@ -99,37 +100,46 @@ def jogar_fase_6():
         relógio.tick(60)  # 60 fps
         tela.fill(PRETO)
 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                exit()
-
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    pausado = not pausado
-
-                if not pausado and event.key == K_SPACE:
-                    eindein.pular()
-                    pulo.play()
-            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
-                    eindein.atacar()
-
         for i in range(cenario_largura // fundo_img.get_width() + 1):
             x = i * fundo_img.get_width() - scroll_x
             tela.blit(fundo_img, (x, 0))
 
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pausado = not pausado
+                if not pausado:
+                    if event.key == K_UP:
+                        eindein.pular()
+                        pulo.play()
+                    if event.key == K_SPACE:
+                        eindein.atacar()
+                        ataque.play()
+
         teclas = pygame.key.get_pressed()
 
         if not pausado:
-            if teclas[K_s]:
+
+            if teclas[K_DOWN]:
                 eindein.agachar(True)
             else:
                 eindein.agachar(False)
 
-                if teclas[K_a]:
-                    if eindein.rect.left > 0 or scroll_x <= 0:
-                        eindein.mover("esquerda")
-                elif teclas[K_d]:
+                if teclas[K_LEFT]:
+                    eindein.direcao = "esquerda"
+                    eindein.animar = True
+
+                    if scroll_x > 0 and eindein.rect.left <= 200:
+                        scroll_x -= 5
+                        scroll_x = max(0, scroll_x)
+                    else:
+                        if eindein.rect.left > 0:
+                            eindein.rect.x -= eindein.velocidade
+
+                elif teclas[K_RIGHT]:
                     eindein.mover("direita")
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
@@ -139,6 +149,8 @@ def jogar_fase_6():
 
             if teclas[K_m] and teclas[K_r]:
                 pygame.mixer.music.stop()
+                estado_jogo.fase_atual = 6
+                artefatos_coletados["anel"] = True
                 fade(tela, largura, altura)
                 from fase7 import jogar_fase_7
                 jogar_fase_7()
@@ -194,6 +206,7 @@ def jogar_fase_6():
 
         if eindein.vida == 0:
             pygame.mixer.music.stop()
+            estado_jogo.fase_atual = 6
             from gameover import Game_over
             Game_over()
             return

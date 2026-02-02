@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import GoblinV
+from enemy import Goblin, Ladrão, GoblinV, Golem, ExplosaoGolem, Elfo, Flecha, Xamã
 from artefato import Sangue
 from hud import desenhar_hud
 from inventario import artefatos_coletados
@@ -46,7 +46,7 @@ def jogar_fase_8():
     overlay.set_alpha(160)
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/fase3.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/fase8.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
@@ -54,6 +54,8 @@ def jogar_fase_8():
     pulo.set_volume(0.5)
     coletar = pygame.mixer.Sound("Assets/Sons/Efeitos/coletar_artefato.mp3")
     coletar.set_volume(0.7)
+    ataque = pygame.mixer.Sound("Assets/Sons/Efeitos/ataque.mp3")
+    ataque.set_volume(0.5)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -67,29 +69,30 @@ def jogar_fase_8():
 
     # sprites
     sprites = pygame.sprite.Group()
+    grupo_projeteis1 = pygame.sprite.Group()
+    grupo_projeteis2 = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     # lista de goblins
-    goblins = [
-        GoblinV(2500, 530),
-        GoblinV(5000, 530),
-        GoblinV(7500, 530),
-        GoblinV(10000, 530),
-        GoblinV(12500, 530),
-        GoblinV(15000, 530),
-        GoblinV(17500, 530),
+    inimigos = [
+        Goblin(2500, 530),
+        Ladrão(4000, 530),
+        GoblinV(5500, 530),
+        Golem(7000, 530, grupo_projeteis1, eindein),
+        Elfo(8500, 530, grupo_projeteis2, eindein),
+        Xamã(10000, 530),
     ]
     sprites.add(eindein)
-    artefato = Sangue(2800, 500)
+    artefato = Sangue(10300, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 3000 # tamanho do cenário
+    cenario_largura = 10500 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
 
     fadein = True
     fade_alpha = 255
-    estado_jogo.fase_atual = 3
+    estado_jogo.fase_atual = 8
     estado_jogo.vida_max_jogador = 4
 
     # loop do jogo
@@ -104,24 +107,34 @@ def jogar_fase_8():
                 if event.key == K_ESCAPE:
                     pausado = not pausado
                 if not pausado:
-                    if event.key == K_SPACE:
+                    if event.key == K_UP:
                         eindein.pular()
                         pulo.play()
-            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
-                    eindein.atacar()
+                    if event.key == K_SPACE:
+                        eindein.atacar()
+                        ataque.play()
 
         teclas = pygame.key.get_pressed()
 
         if not pausado:
-            if teclas[K_s]:
+
+            if teclas[K_DOWN]:
                 eindein.agachar(True)
             else:
                 eindein.agachar(False)
 
-                if teclas[K_a]:
-                    if eindein.rect.left > 0 or scroll_x <= 0:
-                        eindein.mover("esquerda")
-                elif teclas[K_d]:
+                if teclas[K_LEFT]:
+                    eindein.direcao = "esquerda"
+                    eindein.animar = True
+
+                    if scroll_x > 0 and eindein.rect.left <= 200:
+                        scroll_x -= 5
+                        scroll_x = max(0, scroll_x)
+                    else:
+                        if eindein.rect.left > 0:
+                            eindein.rect.x -= eindein.velocidade
+
+                elif teclas[K_RIGHT]:
                     eindein.mover("direita")
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
@@ -131,6 +144,8 @@ def jogar_fase_8():
 
             if teclas[K_m] and teclas[K_r]:
                 pygame.mixer.music.stop()
+                estado_jogo.fase_atual = 8
+                artefatos_coletados["sangue"] = True
                 fade(tela, largura, altura)
                 from fase9 import jogar_fase_9
                 jogar_fase_9()
@@ -141,10 +156,10 @@ def jogar_fase_8():
 
             if eindein.atacando and not eindein.ja_acertou:
                 if 0.9 <= eindein.atual_ataque <= 1.1:
-                    for goblin in goblins:
-                        goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
-                        if eindein.hitbox_ataque.colliderect(goblin_hitbox_tela):
-                            goblin.levar_dano(1)
+                    for inimigo in inimigos:
+                        inimigo_hitbox_tela = inimigo.hitbox.move(-scroll_x, 0)
+                        if eindein.hitbox_ataque.colliderect(inimigo_hitbox_tela):
+                            inimigo.levar_dano(1)
                             eindein.ja_acertou = True
 
             if artefato:
@@ -155,14 +170,37 @@ def jogar_fase_8():
                     artefatos_coletados["sangue"] = True
                     artefato = None
 
-            for goblin in goblins[:]:
-                goblin.update()
-                goblin_hitbox_tela = goblin.hitbox.move(-scroll_x, 0)
+            for inimigo in inimigos[:]:
+                inimigo.update()
+                inimigo_hitbox_tela = inimigo.hitbox.move(-scroll_x, 0)
 
-                if eindein.rect.colliderect(goblin_hitbox_tela):
-                    goblin.encostar_no_player(eindein)
-                if goblin.morreu():
-                    goblins.remove(goblin)
+                if eindein.rect.colliderect(inimigo_hitbox_tela):
+                    inimigo.encostar_no_player(eindein)
+                if inimigo.morreu():
+                    inimigos.remove(inimigo)
+
+            grupo_projeteis1.update()
+            for proj in grupo_projeteis1:
+                tela.blit(proj.image, (proj.rect.x - scroll_x, proj.rect.y))
+                hitbox_tela = proj.hitbox.move(-scroll_x, 0)
+
+                if isinstance(proj, ExplosaoGolem):
+                    if not hasattr(proj, "dano_aplicado"):
+                        proj.dano_aplicado = False
+
+                    if hitbox_tela.colliderect(eindein.rect) and not proj.dano_aplicado:
+                        eindein.levar_dano(proj.dano)
+                        proj.dano_aplicado = True
+            
+            grupo_projeteis2.update()
+            for flecha in grupo_projeteis2:
+                tela.blit(flecha.image, (flecha.rect.x - scroll_x, flecha.rect.y))
+
+                flecha_hitbox_tela = flecha.hitbox.move(-scroll_x, 0)
+                if eindein.rect.colliderect(flecha_hitbox_tela) and not flecha.dano_aplicado:
+                    eindein.levar_dano(flecha.dano)
+                    flecha.dano_aplicado = True
+                    flecha.kill()
 
         tela.fill(PRETO)
 
@@ -178,8 +216,11 @@ def jogar_fase_8():
             tela.blit(artefato.image, (artefato.rect.x - scroll_x, artefato.rect.y))
 
         # goblins
-        for goblin in goblins:
-            tela.blit(goblin.image, (goblin.rect.x - scroll_x, goblin.rect.y))
+        for inimigo in inimigos:
+            if isinstance(inimigo, Xamã):
+                inimigo.desenhar_aura(tela, scroll_x)
+            tela.blit(inimigo.image, (inimigo.rect.x - scroll_x, inimigo.rect.y))
+            inimigo.desenhar_barra_hp(tela, scroll_x)
 
         for i in range(eindein.vida_max):
             if i < eindein.vida:
@@ -189,6 +230,7 @@ def jogar_fase_8():
 
         if not pausado and eindein.vida == 0:
             pygame.mixer.music.stop()
+            estado_jogo.fase_atual = 8
             from gameover import Game_over
             Game_over()
             return

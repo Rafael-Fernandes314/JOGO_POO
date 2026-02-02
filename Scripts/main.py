@@ -4,7 +4,7 @@ from fase2 import jogar_fase_2
 from fase3 import jogar_fase_3
 from fase4 import jogar_fase_4
 from fase5 import jogar_fase_5
-from fase6 import jogar_fase_6
+from fase6 import jogar_fase_6 
 from fase7 import jogar_fase_7
 from fase8 import jogar_fase_8
 from fase9 import jogar_fase_9

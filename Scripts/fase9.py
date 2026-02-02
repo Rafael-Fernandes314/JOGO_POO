@@ -40,12 +40,10 @@ def jogar_fase_9():
     rect_texto_pause = texto_pause.get_rect(center=(largura // 2, altura // 2 + 120))
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/fase2.mp3")
-    pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play(-1)
-
     pulo = pygame.mixer.Sound("Assets/Sons/Efeitos/pulo.mp3")
     pulo.set_volume(0.5)
+    ataque = pygame.mixer.Sound("Assets/Sons/Efeitos/ataque.mp3")
+    ataque.set_volume(0.5)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -78,7 +76,7 @@ def jogar_fase_9():
 
     fadein = True
     fade_alpha = 255
-    estado_jogo.fase_atual = 2
+    estado_jogo.fase_atual = 9
     estado_jogo.vida_max_jogador = 5
 
     # loop do jogo
@@ -96,31 +94,38 @@ def jogar_fase_9():
             if event.type == QUIT:
                 pygame.quit()
                 exit()
-
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     pausado = not pausado
-
                 if not pausado:
-                    if event.key == K_SPACE:
+                    if event.key == K_UP:
                         eindein.pular()
                         pulo.play()
-            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
-                    eindein.atacar()
+                    if event.key == K_SPACE:
+                        eindein.atacar()
+                        ataque.play()
 
-        # teclas que tão sendo seguradas
+        teclas = pygame.key.get_pressed()
+
         if not pausado:
-            teclas = pygame.key.get_pressed()
 
-            if teclas[K_s]:
+            if teclas[K_DOWN]:
                 eindein.agachar(True)
             else:
                 eindein.agachar(False)
 
-                if teclas[K_a]:
-                    if eindein.rect.left > 0 or scroll_x <= 0:
-                        eindein.mover("esquerda")
-                elif teclas[K_d]:
+                if teclas[K_LEFT]:
+                    eindein.direcao = "esquerda"
+                    eindein.animar = True
+
+                    if scroll_x > 0 and eindein.rect.left <= 200:
+                        scroll_x -= 5
+                        scroll_x = max(0, scroll_x)
+                    else:
+                        if eindein.rect.left > 0:
+                            eindein.rect.x -= eindein.velocidade
+
+                elif teclas[K_RIGHT]:
                     eindein.mover("direita")
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
@@ -130,6 +135,7 @@ def jogar_fase_9():
 
             if teclas[K_m] and teclas[K_r]:
                 pygame.mixer.music.stop()
+                estado_jogo.fase_atual = 9
                 fade(tela, largura, altura)
                 from faseBoss import faseBoss
                 faseBoss()
@@ -168,6 +174,7 @@ def jogar_fase_9():
 
         if eindein.vida == 0:
             pygame.mixer.music.stop()
+            estado_jogo.fase_atual = 9
             from gameover import Game_over
             Game_over()
             return

@@ -54,6 +54,8 @@ def jogar_fase_1():
     pulo.set_volume(0.5)
     coletar = pygame.mixer.Sound("Assets/Sons/Efeitos/coletar_artefato.mp3")
     coletar.set_volume(0.7)
+    ataque = pygame.mixer.Sound("Assets/Sons/Efeitos/ataque.mp3")
+    ataque.set_volume(0.5)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -101,11 +103,12 @@ def jogar_fase_1():
                 if event.key == K_ESCAPE:
                     pausado = not pausado
                 if not pausado:
-                    if event.key == K_SPACE:
+                    if event.key == K_UP:
                         eindein.pular()
                         pulo.play()
-            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
-                    eindein.atacar()
+                    if event.key == K_SPACE:
+                        eindein.atacar()
+                        ataque.play()
 
         teclas = pygame.key.get_pressed()
 
@@ -119,15 +122,23 @@ def jogar_fase_1():
                             goblin.levar_dano(1)
                             eindein.ja_acertou = True
 
-            if teclas[K_s]:
+            if teclas[K_DOWN]:
                 eindein.agachar(True)
             else:
                 eindein.agachar(False)
 
-                if teclas[K_a]:
-                    if eindein.rect.left > 0 or scroll_x <= 0:
-                        eindein.mover("esquerda")
-                elif teclas[K_d]:
+                if teclas[K_LEFT]:
+                    eindein.direcao = "esquerda"
+                    eindein.animar = True
+
+                    if scroll_x > 0 and eindein.rect.left <= 200:
+                        scroll_x -= 5
+                        scroll_x = max(0, scroll_x)
+                    else:
+                        if eindein.rect.left > 0:
+                            eindein.rect.x -= eindein.velocidade
+
+                elif teclas[K_RIGHT]:
                     eindein.mover("direita")
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
@@ -138,6 +149,8 @@ def jogar_fase_1():
             if teclas[K_m] and teclas[K_r]:
                 pygame.mixer.music.stop()
                 fade(tela, largura, altura)
+                estado_jogo.fase_atual = 1
+                artefatos_coletados["chave"] = True
                 from fase2 import jogar_fase_2
                 jogar_fase_2()
                 return
@@ -188,6 +201,7 @@ def jogar_fase_1():
 
         if not pausado and eindein.vida == 0:
             pygame.mixer.music.stop()
+            estado_jogo.fase_atual = 1
             from gameover import Game_over
             Game_over()
             return

@@ -54,6 +54,8 @@ def jogar_fase_3():
     pulo.set_volume(0.5)
     coletar = pygame.mixer.Sound("Assets/Sons/Efeitos/coletar_artefato.mp3")
     coletar.set_volume(0.7)
+    ataque = pygame.mixer.Sound("Assets/Sons/Efeitos/ataque.mp3")
+    ataque.set_volume(0.5)
 
     coração_vermelho = pygame.image.load("Assets/Sprites/UI/coração1.png")
     coração_vermelho = pygame.transform.scale(coração_vermelho, (120, 120))
@@ -75,14 +77,12 @@ def jogar_fase_3():
         GoblinV(5500, 530),
         GoblinV(7000, 530),
         GoblinV(8500, 530),
-        GoblinV(10000, 530),
-        GoblinV(11300, 530),
     ]
     sprites.add(eindein)
-    artefato = Orbe(11800, 500)
+    artefato = Orbe(8800, 500)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 12000 # tamanho do cenário
+    cenario_largura = 9000 # tamanho do cenário
 
     tela.blit(fundo_img, (0, 0))
     pygame.display.flip()
@@ -104,24 +104,34 @@ def jogar_fase_3():
                 if event.key == K_ESCAPE:
                     pausado = not pausado
                 if not pausado:
-                    if event.key == K_SPACE:
+                    if event.key == K_UP:
                         eindein.pular()
                         pulo.play()
-            if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
-                    eindein.atacar()
+                    if event.key == K_SPACE:
+                        eindein.atacar()
+                        ataque.play()
 
         teclas = pygame.key.get_pressed()
 
         if not pausado:
-            if teclas[K_s]:
+
+            if teclas[K_DOWN]:
                 eindein.agachar(True)
             else:
                 eindein.agachar(False)
 
-                if teclas[K_a]:
-                    if eindein.rect.left > 0 or scroll_x <= 0:
-                        eindein.mover("esquerda")
-                elif teclas[K_d]:
+                if teclas[K_LEFT]:
+                    eindein.direcao = "esquerda"
+                    eindein.animar = True
+
+                    if scroll_x > 0 and eindein.rect.left <= 200:
+                        scroll_x -= 5
+                        scroll_x = max(0, scroll_x)
+                    else:
+                        if eindein.rect.left > 0:
+                            eindein.rect.x -= eindein.velocidade
+
+                elif teclas[K_RIGHT]:
                     eindein.mover("direita")
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
@@ -131,6 +141,8 @@ def jogar_fase_3():
 
         if teclas[K_m] and teclas[K_r]:
             pygame.mixer.music.stop()
+            estado_jogo.fase_atual = 3
+            artefatos_coletados["orbe"] = True
             fade(tela, largura, altura)
             from fase4 import jogar_fase_4
             jogar_fase_4()
@@ -190,6 +202,7 @@ def jogar_fase_3():
 
         if not pausado and eindein.vida == 0:
             pygame.mixer.music.stop()
+            estado_jogo.fase_atual = 3
             from gameover import Game_over
             Game_over()
             return

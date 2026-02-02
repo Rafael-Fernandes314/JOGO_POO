@@ -16,6 +16,12 @@ escudo = pygame.transform.scale(escudo, (64, 64))
 anel = pygame.image.load("Assets/Sprites/Arterfatos/anel.png")
 anel = pygame.transform.scale(anel, (64, 64))
 
+emblema = pygame.image.load("Assets/Sprites/Arterfatos/emblema.png")
+emblema = pygame.transform.scale(emblema, (64, 64))
+
+sangue = pygame.image.load("Assets/Sprites/Arterfatos/sangue.png")
+sangue = pygame.transform.scale(sangue, (64, 64))
+
 def desenhar_hud(tela, largura, altura):
     pos_x = largura - 80
     pos_y = altura - 640
@@ -42,9 +48,9 @@ def desenhar_hud(tela, largura, altura):
         pos_x -= 80
     
     if artefatos_coletados["emblema"]:
-        tela.blit(anel, (pos_x, pos_y))
+        tela.blit(emblema, (pos_x, pos_y))
         pos_x -= 80
     
     if artefatos_coletados["sangue"]:
-        tela.blit(anel, (pos_x, pos_y))
+        tela.blit(sangue, (pos_x, pos_y))
         pos_x -= 80
