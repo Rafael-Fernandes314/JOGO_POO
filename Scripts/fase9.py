@@ -2,7 +2,6 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Ladrão
 from hud import desenhar_hud
 import estado_jogo
 
@@ -58,16 +57,6 @@ def jogar_fase_9():
     # sprites
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
-    # lista de goblins
-    ladrões = [
-        Ladrão(2500, 530),
-        Ladrão(5000, 530),
-        Ladrão(7500, 530),
-        Ladrão(10000, 530),
-        Ladrão(12500, 530),
-        Ladrão(15000, 530),
-        Ladrão(17500, 530),
-    ]
     sprites.add(eindein)
 
     relógio = pygame.time.Clock()
@@ -142,29 +131,6 @@ def jogar_fase_9():
                 return
 
             sprites.update()
-
-            if eindein.atacando and not eindein.ja_acertou:
-                if 0.9 <= eindein.atual_ataque <= 1.1:
-                    for ladrão in ladrões:
-                        ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
-                        if eindein.hitbox_ataque.colliderect(ladrão_hitbox_tela):
-                            ladrão.levar_dano(1)
-                            eindein.ja_acertou = True
-
-
-            for ladrão in ladrões[:]:
-                ladrão.update()
-                ladrão_hitbox_tela = ladrão.hitbox.move(-scroll_x, 0)
-
-                if eindein.rect.colliderect(ladrão_hitbox_tela):
-                    ladrão.encostar_no_player(eindein)
-
-                if ladrão.morreu():
-                    ladrões.remove(ladrão)
-
-        sprites.draw(tela)
-        for ladrão in ladrões:
-            tela.blit(ladrão.image, (ladrão.rect.x - scroll_x, ladrão.rect.y))
 
         for i in range(eindein.vida_max):
             if i < eindein.vida:

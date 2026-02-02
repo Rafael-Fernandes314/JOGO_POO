@@ -2,10 +2,11 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Boss
+from enemy import Boss, AtaqueBoss
 from artefato import ItemPuzzle
 from hud import desenhar_hud
 import estado_jogo
+import random
 
 def fade(tela, largura, altura):
     fade = pygame.Surface((largura, altura))
@@ -57,20 +58,33 @@ def faseBoss():
     coração_preto = pygame.transform.scale(coração_preto, (120, 120))
 
     # carrega o fundo
-    fundo_img = pygame.image.load("Assets/Sprites/Cenários/faseBoss.png").convert()
+    fundo_img = pygame.image.load("Assets/Sprites/Cenários/fase9.png").convert()
     fundo_img = pygame.transform.scale(fundo_img, (1020, 680))
 
     # sprites
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
 
-    boss = Boss(800, 550)
+    boss = Boss(510, 440)
+    ataques_boss = pygame.sprite.Group()
 
-    item = ItemPuzzle(500, 550)
+    item = None
+
+    posicoes_spawn = [
+        (200, 550),
+        (400, 550),
+        (600, 550),
+        (800, 550)
+    ]
+
+    tempo_spawn_item = 8000
+    ultimo_spawn_item = pygame.time.get_ticks()
+
+    tempo_ataque_boss = 2000
+    ultimo_ataque_boss = pygame.time.get_ticks()
 
     sprites.add(eindein)
     sprites.add(boss)
-    sprites.add(item)
 
     # lista de goblins
     sprites.add(eindein)
@@ -114,6 +128,26 @@ def faseBoss():
 
         if not pausado:
 
+            agora = pygame.time.get_ticks()
+
+            if agora - ultimo_ataque_boss >= tempo_ataque_boss:
+
+                for _ in range(random.randint(1, 3)):
+                    x_random = random.randint(50, largura - 50)
+                    ataque = AtaqueBoss(x_random, 0)
+                    ataques_boss.add(ataque)
+
+                ultimo_ataque_boss = agora
+
+            if item is None and agora - ultimo_spawn_item >= tempo_spawn_item:
+                pos = random.choice(posicoes_spawn)
+                item = ItemPuzzle(pos[0], pos[1])
+                sprites.add(item)
+                ultimo_spawn_item = agora
+
+            if pygame.sprite.spritecollide(eindein, ataques_boss, True):
+                eindein.levar_dano(1)
+
             if teclas[K_DOWN]:
                 eindein.agachar(True)
             else:
@@ -147,14 +181,16 @@ def faseBoss():
                 return
 
             if item and eindein.rect.colliderect(item.hitbox):
-                Boss.levar_dano()
+                boss.levar_dano(1)
                 item.kill()
                 item = None
 
             sprites.update()
+            ataques_boss.update()
 
             sprites.draw(tela)
-            Boss.desenhar_barra_hp(tela)
+            ataques_boss.draw(tela)
+            boss.desenhar_barra_hp(tela)
 
         for i in range(eindein.vida_max):
             if i < eindein.vida:
@@ -189,7 +225,7 @@ def faseBoss():
 
         pygame.display.flip()  # atualiza a tela
 
-        if Boss.morreu():
+        if boss.morreu():
             pygame.mixer.music.stop()
             fade(tela, largura, altura)
             from final import tela_final

@@ -570,7 +570,7 @@ class Boss(pygame.sprite.Sprite):
         super().__init__()
 
         imagem = pygame.image.load("Assets/Sprites/Inimigos/Boss.png").convert_alpha()
-        imagem = pygame.transform.scale(imagem, (300, 300))
+        imagem = pygame.transform.scale(imagem, (700, 500))
 
         self.image = imagem
         self.rect = self.image.get_rect(midbottom=(x, y))
@@ -607,3 +607,21 @@ class Boss(pygame.sprite.Sprite):
 
     def update(self):
         pass
+
+class AtaqueBoss(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+
+        imagem = pygame.image.load("Assets/Sprites/Inimigos/Projetil.png").convert_alpha()
+        imagem = pygame.transform.scale(imagem, (60, 60))
+
+        self.image = imagem
+        self.rect = self.image.get_rect(midtop=(x, y))
+
+        self.velocidade = 7
+
+    def update(self):
+        self.rect.y += self.velocidade
+
+        if self.rect.top > 680:
+            self.kill()
