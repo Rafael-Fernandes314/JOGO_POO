@@ -8,6 +8,7 @@ from fase6 import jogar_fase_6
 from fase7 import jogar_fase_7
 from fase8 import jogar_fase_8
 from fase9 import jogar_fase_9
+from faseBoss import faseBoss
 from final import tela_final
 from gameover import Game_over
 import estado_jogo
@@ -37,6 +38,8 @@ def main():
         elif estado_jogo.fase_atual == 9:
             jogar_fase_9()
         elif estado_jogo.fase_atual == 10:
+            faseBoss()
+        elif estado_jogo.fase_atual == 11:
             tela_final()
 
 if __name__ == "__main__":

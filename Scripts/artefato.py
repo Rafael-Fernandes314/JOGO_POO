@@ -69,3 +69,15 @@ class Sangue(Artefato):
         self.image = pygame.image.load("Assets\Sprites\Arterfatos\sangue.png")
         self.image = pygame.transform.scale(self.image, (100, 100))
         super().__init__(largura, altura)
+
+class ItemPuzzle(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+
+        self.image = pygame.image.load("Assets/Sprites/Arterfatos/item.png").convert_alpha()
+        self.rect = self.image.get_rect(midbottom=(x, y))
+
+        self.hitbox = self.rect.copy()
+
+    def update(self):
+        pass

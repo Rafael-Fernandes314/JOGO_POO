@@ -133,6 +133,15 @@ def jogar_fase_1():
                         scroll_x += 5
                         eindein.rect.left = 200
 
+            teclas = pygame.key.get_pressed()
+
+            if teclas[K_m] and teclas[K_r]:
+                pygame.mixer.music.stop()
+                fade(tela, largura, altura)
+                from fase2 import jogar_fase_2
+                jogar_fase_2()
+                return
+
         if not pausado:
             sprites.update()
 

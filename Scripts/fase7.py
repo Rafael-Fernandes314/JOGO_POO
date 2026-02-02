@@ -134,6 +134,15 @@ def jogar_fase_7():
                         scroll_x += 5
                         eindein.rect.left = 200
 
+            teclas = pygame.key.get_pressed()
+
+            if teclas[K_m] and teclas[K_r]:
+                pygame.mixer.music.stop()
+                fade(tela, largura, altura)
+                from fase8 import jogar_fase_8
+                jogar_fase_8()
+                return
+
             for xamã in xamãs[:]:
                 xamã.update()
                 xamã.causar_dano(eindein, scroll_x)

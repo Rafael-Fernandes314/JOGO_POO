@@ -564,3 +564,46 @@ class Xamã(Goblin):
         super().update()
         self.ativar_aura()
         self.atualizar_aura()
+
+class Boss(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+
+        imagem = pygame.image.load("Assets/Sprites/Inimigos/Boss.png").convert_alpha()
+        imagem = pygame.transform.scale(imagem, (300, 300))
+
+        self.image = imagem
+        self.rect = self.image.get_rect(midbottom=(x, y))
+
+        self.vida_max = 5
+        self.vida = self.vida_max
+        self.morto = False
+
+        self.hp_largura = 200
+        self.hp_altura = 15
+
+    def levar_dano(self, qtd=1):
+        if self.morto:
+            return
+
+        self.vida -= qtd
+
+        if self.vida <= 0:
+            self.morto = True
+
+    def morreu(self):
+        return self.morto
+
+    def desenhar_barra_hp(self, tela):
+        fundo = pygame.Rect(410, 40, self.hp_largura, self.hp_altura)
+
+        proporcao = self.vida / self.vida_max
+        largura = int(self.hp_largura * proporcao)
+
+        vida = pygame.Rect(410, 40, largura, self.hp_altura)
+
+        pygame.draw.rect(tela, (120, 0, 0), fundo)
+        pygame.draw.rect(tela, (0, 200, 0), vida)
+
+    def update(self):
+        pass

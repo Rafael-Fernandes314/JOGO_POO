@@ -135,6 +135,15 @@ def jogar_fase_6():
                         scroll_x += 5
                         eindein.rect.left = 200
 
+            teclas = pygame.key.get_pressed()
+
+            if teclas[K_m] and teclas[K_r]:
+                pygame.mixer.music.stop()
+                fade(tela, largura, altura)
+                from fase7 import jogar_fase_7
+                jogar_fase_7()
+                return
+
             sprites.update()
             sprites.draw(tela)
 

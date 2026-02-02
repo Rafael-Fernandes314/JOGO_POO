@@ -79,7 +79,7 @@ def jogar_fase_9():
     fadein = True
     fade_alpha = 255
     estado_jogo.fase_atual = 2
-    estado_jogo.vida_max_jogador = 4
+    estado_jogo.vida_max_jogador = 5
 
     # loop do jogo
     while True:
@@ -125,6 +125,15 @@ def jogar_fase_9():
                     if eindein.rect.left >= 200 and scroll_x < cenario_largura - largura:
                         scroll_x += 5
                         eindein.rect.left = 200
+
+            teclas = pygame.key.get_pressed()
+
+            if teclas[K_m] and teclas[K_r]:
+                pygame.mixer.music.stop()
+                fade(tela, largura, altura)
+                from faseBoss import faseBoss
+                faseBoss()
+                return
 
             sprites.update()
 
@@ -186,6 +195,6 @@ def jogar_fase_9():
         if eindein.rect.x + scroll_x >= cenario_largura:
             pygame.mixer.music.stop()
             fade(tela,largura,altura)
-            from final import tela_final
-            tela_final()
+            from faseBoss import faseBoss
+            faseBoss()
             return

@@ -108,6 +108,15 @@ def jogar_fase_2():
             if event.type == pygame.MOUSEBUTTONDOWN and not pausado:
                     eindein.atacar()
 
+            teclas = pygame.key.get_pressed()
+
+            if teclas[K_m] and teclas[K_r]:
+                pygame.mixer.music.stop()
+                fade(tela, largura, altura)
+                from fase3 import jogar_fase_3
+                jogar_fase_3()
+                return
+
         # teclas que tão sendo seguradas
         if not pausado:
             teclas = pygame.key.get_pressed()
