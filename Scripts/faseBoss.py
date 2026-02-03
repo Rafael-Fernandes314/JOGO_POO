@@ -77,7 +77,7 @@ def faseBoss():
         (800, 550)
     ]
 
-    tempo_spawn_item = 8000
+    tempo_spawn_item = 6000
     ultimo_spawn_item = pygame.time.get_ticks()
 
     tempo_ataque_boss = 2000
@@ -150,8 +150,10 @@ def faseBoss():
                 sprites.add(item)
                 ultimo_spawn_item = agora
 
-            if pygame.sprite.spritecollide(eindein, ataques_boss, True):
-                eindein.levar_dano(1)
+            for ataque in ataques_boss:
+                if ataque.hitbox.colliderect(eindein.hitbox):
+                    eindein.levar_dano(1)
+                    ataque.kill()
 
             if teclas[K_DOWN]:
                 eindein.agachar(True)
