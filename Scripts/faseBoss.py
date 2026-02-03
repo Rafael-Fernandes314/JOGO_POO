@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 from player import Eindein
-from enemy import Boss, AtaqueBoss
+from enemy import Boss, AtaqueBoss, AtaqueLateralAlto, AtaqueLateralBaixo
 from artefato import ItemPuzzle
 from hud import desenhar_hud
 import estado_jogo
@@ -132,10 +132,18 @@ def faseBoss():
 
             if agora - ultimo_ataque_boss >= tempo_ataque_boss:
 
-                for _ in range(random.randint(1, 3)):
-                    x_random = random.randint(50, largura - 50)
-                    ataque = AtaqueBoss(x_random, 0)
-                    ataques_boss.add(ataque)
+                tipo = random.choice(["chuva", "alto", "baixo"])
+
+                if tipo == "chuva":
+                    for _ in range(random.randint(1, 3)):
+                        x_random = random.randint(50, largura - 50)
+                        ataques_boss.add(AtaqueBoss(x_random, 0))
+
+                elif tipo == "alto":
+                    ataques_boss.add(AtaqueLateralAlto(eindein, largura))
+
+                elif tipo == "baixo":
+                    ataques_boss.add(AtaqueLateralBaixo(eindein, largura))
 
                 ultimo_ataque_boss = agora
 

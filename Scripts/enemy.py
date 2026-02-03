@@ -575,12 +575,12 @@ class Boss(pygame.sprite.Sprite):
         self.image = imagem
         self.rect = self.image.get_rect(midbottom=(x, y))
 
-        self.vida_max = 5
+        self.vida_max = 15
         self.vida = self.vida_max
         self.morto = False
 
         self.hp_largura = 200
-        self.hp_altura = 15
+        self.hp_altura = 10
 
     def levar_dano(self, qtd=1):
         if self.morto:
@@ -624,4 +624,52 @@ class AtaqueBoss(pygame.sprite.Sprite):
         self.rect.y += self.velocidade
 
         if self.rect.top > 680:
+            self.kill()
+
+class AtaqueLateralAlto(pygame.sprite.Sprite):
+    def __init__(self, player, largura):
+        super().__init__()
+
+        self.image = pygame.image.load("Assets/Sprites/Inimigos/Projetil.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (60, 60))
+
+        lado = random.choice(["esquerda", "direita"])
+
+        y = player.rect.centery - 100
+
+        if lado == "esquerda":
+            self.rect = self.image.get_rect(midleft=(0, y))
+            self.velocidade = 7
+        else:
+            self.rect = self.image.get_rect(midright=(largura, y))
+            self.velocidade = -7
+
+    def update(self):
+        self.rect.x += self.velocidade
+
+        if self.rect.right < 0 or self.rect.left > 1020:
+            self.kill()
+
+class AtaqueLateralBaixo(pygame.sprite.Sprite):
+    def __init__(self, player, largura):
+        super().__init__()
+
+        self.image = pygame.image.load("Assets/Sprites/Inimigos/Projetil.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (60, 60))
+
+        lado = random.choice(["esquerda", "direita"])
+
+        y = player.rect.bottom - 8
+
+        if lado == "esquerda":
+            self.rect = self.image.get_rect(midleft=(0, y))
+            self.velocidade = 7
+        else:
+            self.rect = self.image.get_rect(midright=(largura, y))
+            self.velocidade = -7
+
+    def update(self):
+        self.rect.x += self.velocidade
+
+        if self.rect.right < 0 or self.rect.left > 1020:
             self.kill()
