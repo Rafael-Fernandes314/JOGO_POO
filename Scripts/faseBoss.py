@@ -17,6 +17,43 @@ def fade(tela, largura, altura):
         pygame.display.update()
         pygame.time.delay(3)
 
+def tocar_cutscene(tela, largura, altura, pasta_frames, fps=12):
+    import os
+
+    frames = []
+
+    arquivos = sorted(os.listdir(pasta_frames))
+
+    for arquivo in arquivos:
+        img = pygame.image.load(os.path.join(pasta_frames, arquivo)).convert()
+        img = pygame.transform.scale(img, (largura, altura))
+        frames.append(img)
+
+    clock = pygame.time.Clock()
+    rodando = True
+    frame_atual = 0
+
+    while rodando:
+        clock.tick(fps)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+            # permite pular cutscene
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return
+
+        tela.blit(frames[frame_atual], (0, 0))
+        pygame.display.update()
+
+        frame_atual += 1
+
+        if frame_atual >= len(frames):
+            rodando = False
+
 def faseBoss():
     pygame.init()
 
@@ -30,6 +67,7 @@ def faseBoss():
     # cria a tela e título do jogo
     tela = pygame.display.set_mode((largura, altura))
     pygame.display.set_caption("Herdeiros do Fim")
+    tocar_cutscene(tela, largura, altura, "Assets/Sprites/Boss-intro")
 
     pausado = False
 
