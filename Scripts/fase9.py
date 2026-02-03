@@ -58,7 +58,6 @@ def jogar_fase_9():
     sprites = pygame.sprite.Group()
     eindein = Eindein()            # cria um jogador
     sprites.add(eindein)
-
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
     cenario_largura = 3000 # tamanho do cenário
@@ -131,6 +130,7 @@ def jogar_fase_9():
                 return
 
             sprites.update()
+            sprites.draw(tela)
 
         for i in range(eindein.vida_max):
             if i < eindein.vida:

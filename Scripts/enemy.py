@@ -614,9 +614,8 @@ class AtaqueBoss(pygame.sprite.Sprite):
         self.image = pygame.image.load("Assets/Sprites/Inimigos/Projetil.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect(midtop=(x, y))
-        self.hitbox = pygame.Rect(0, 0, 5, 5)
+        self.hitbox = pygame.Rect(0, 0, 12, 12)
         self.hitbox.center = self.rect.center
-
         self.velocidade = 7
 
     def update(self):
@@ -634,7 +633,6 @@ class AtaqueLateralAlto(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (60, 60))
 
         lado = random.choice(["esquerda", "direita"])
-
         y = player.rect.centery - 100
 
         if lado == "esquerda":
@@ -643,9 +641,13 @@ class AtaqueLateralAlto(pygame.sprite.Sprite):
         else:
             self.rect = self.image.get_rect(midright=(largura, y))
             self.velocidade = -7
+        
+        self.hitbox = pygame.Rect(0, 0, 12, 12)
+        self.hitbox.center = self.rect.center
 
     def update(self):
         self.rect.x += self.velocidade
+        self.hitbox.center = self.rect.center
 
         if self.rect.right < 0 or self.rect.left > 1020:
             self.kill()

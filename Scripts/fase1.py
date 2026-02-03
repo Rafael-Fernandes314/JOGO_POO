@@ -77,14 +77,12 @@ def jogar_fase_1():
         Goblin(5500, 530),
         Goblin(7000, 530),
         Goblin(8500, 530),
-        Goblin(10000, 530),
-        Goblin(11300, 530),
     ]
-    artefato = Chave(11800, 500)
+    artefato = Chave(8800, 500)
     sprites.add(eindein)
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 12000 # tamanho do cenário
+    cenario_largura = 9000 # tamanho do cenário
 
     fadein = True
     fade_alpha = 255
