@@ -611,17 +611,17 @@ class Boss(pygame.sprite.Sprite):
 class AtaqueBoss(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-
-        imagem = pygame.image.load("Assets/Sprites/Inimigos/Projetil.png").convert_alpha()
-        imagem = pygame.transform.scale(imagem, (60, 60))
-
-        self.image = imagem
+        self.image = pygame.image.load("Assets/Sprites/Inimigos/Projetil.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect(midtop=(x, y))
+        self.hitbox = pygame.Rect(0, 0, 5, 5)
+        self.hitbox.center = self.rect.center
 
         self.velocidade = 7
 
     def update(self):
         self.rect.y += self.velocidade
+        self.hitbox.center = self.rect.center
 
         if self.rect.top > 680:
             self.kill()

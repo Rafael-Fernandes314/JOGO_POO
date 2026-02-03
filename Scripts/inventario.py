@@ -7,3 +7,7 @@ artefatos_coletados = {
     "emblema": False,
     "sangue": False
 }
+
+def resetar_artefatos():
+    for key in artefatos_coletados:
+        artefatos_coletados[key] = False
