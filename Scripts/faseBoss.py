@@ -42,7 +42,7 @@ def faseBoss():
     rect_texto_pause = texto_pause.get_rect(center=(largura // 2, altura // 2 + 120))
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/fase2.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/boss.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
@@ -95,7 +95,7 @@ def faseBoss():
 
     fadein = True
     fade_alpha = 255
-    estado_jogo.fase_atual = 2
+    estado_jogo.fase_atual = 10
     estado_jogo.vida_max_jogador = 5
 
     # loop do jogo
@@ -120,9 +120,6 @@ def faseBoss():
                     if event.key == K_UP:
                         eindein.pular()
                         pulo.play()
-                    if event.key == K_SPACE:
-                        eindein.atacar()
-                        ataque.play()
 
         teclas = pygame.key.get_pressed()
 
@@ -187,6 +184,11 @@ def faseBoss():
                 from final import tela_final
                 tela_final()
                 return
+            
+            if eindein.rect.left < 0:
+                eindein.rect.left = 0
+            if eindein.rect.right > largura:
+                eindein.rect.right = largura
 
             if item and eindein.rect.colliderect(item.hitbox):
                 boss.levar_dano(1)

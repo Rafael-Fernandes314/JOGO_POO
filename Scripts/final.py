@@ -2,6 +2,8 @@ import pygame
 from pygame.locals import *
 from sys import exit
 import math
+import estado_jogo
+from inventario import resetar_artefatos
 
 def fade(tela, largura, altura, fundo_img, logo, rect_logo_animado, texto, rect_texto):
     fade = pygame.Surface((largura, altura))
@@ -45,7 +47,7 @@ def tela_final():
     rect_texto = texto.get_rect(center=(largura // 2, altura // 2 + 200))
 
     pygame.mixer.init()
-    pygame.mixer.music.load("Assets/Sons/Música/menu.mp3")
+    pygame.mixer.music.load("Assets/Sons/Música/final.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
@@ -66,12 +68,15 @@ def tela_final():
                 exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
-                    iniciar.play()
-                    pygame.mixer.music.stop()
-                    fade(tela, largura, altura, fundo_img, logo, rect_logo_animado, texto, rect_texto)
-                    import estado_jogo
-                    estado_jogo.fase_atual = 0
-                    return
+                    if event.key == K_SPACE:
+                        iniciar.play()
+                        pygame.mixer.music.stop()
+
+                        resetar_artefatos()
+                        estado_jogo.resetar_jogo()
+
+                        fade(tela, largura, altura, fundo_img, logo, rect_logo_animado, texto, rect_texto)
+                        return
 
         tela.blit(fundo_img, (0,0))
         tempo = pygame.time.get_ticks() / 1000

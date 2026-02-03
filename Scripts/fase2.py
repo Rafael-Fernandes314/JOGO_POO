@@ -67,13 +67,12 @@ def jogar_fase_2():
         Ladrão(2500, 530),
         Ladrão(4000, 530),
         Ladrão(5500, 530),
-        Ladrão(7000, 530),
     ]
     sprites.add(eindein)
 
     relógio = pygame.time.Clock()
     scroll_x = 0  # controla a mudança da câmera
-    cenario_largura = 7500 # tamanho do cenário
+    cenario_largura = 6000 # tamanho do cenário
 
     fadein = True
     fade_alpha = 255
