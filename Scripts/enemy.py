@@ -636,7 +636,7 @@ class AtaqueLateralAlto(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (60, 60))
 
         lado = random.choice(["esquerda", "direita"])
-        y = player.rect.centery - 100
+        y = player.rect.centery - 70
 
         if lado == "esquerda":
             self.rect = self.image.get_rect(midleft=(0, y))

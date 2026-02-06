@@ -144,7 +144,7 @@ def jogar_fase_1():
 
             teclas = pygame.key.get_pressed()
 
-            if teclas[K_m] and teclas[K_r]:
+            if teclas[K_m] and teclas[K_r] and teclas[K_DELETE]:
                 pygame.mixer.music.stop()
                 fade(tela, largura, altura)
                 estado_jogo.fase_atual = 1

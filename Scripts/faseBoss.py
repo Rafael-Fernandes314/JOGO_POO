@@ -109,16 +109,16 @@ def faseBoss():
     item = None
 
     posicoes_spawn = [
-        (200, 550),
+        (300, 550),
         (400, 550),
         (600, 550),
-        (800, 550)
+        (700, 550)
     ]
 
     tempo_spawn_item = 6000
     ultimo_spawn_item = pygame.time.get_ticks()
-
-    tempo_ataque_boss = 2000
+    
+    tempo_ataque_boss = 1000
     ultimo_ataque_boss = pygame.time.get_ticks()
 
     sprites.add(eindein)
